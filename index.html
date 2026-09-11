@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>宝石物性检索 · Chart A</title>
+  <style>
+    :root{--ink:#1d2927;--muted:#63716e;--line:#dce4df;--paper:#f7f8f4;--accent:#006d5b;--warm:#dd9b33;--card:#fff}
+    *{box-sizing:border-box} body{margin:0;background:var(--paper);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC",sans-serif;color:var(--ink)}
+    header{padding:40px max(24px,calc((100vw - 1180px)/2));background:#123c36;color:#fff}.eyebrow{font-size:12px;letter-spacing:.11em;opacity:.72}.title{margin:8px 0 6px;font-size:clamp(26px,4vw,42px);letter-spacing:-.04em}.sub{margin:0;color:#d7e6df;font-size:15px}
+    main{max-width:1180px;margin:0 auto;padding:24px}.notice{border-left:4px solid var(--warm);background:#fff9ed;padding:12px 14px;font-size:13px;line-height:1.5;color:#594820;margin-bottom:20px}
+    .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 2px 8px #17372a08}.fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.field{min-width:0}.field.search{grid-column:span 2}.field label,.multi legend{display:block;font-size:12px;color:var(--muted);margin:0 0 7px}input{width:100%;border:1px solid #c8d4ce;border-radius:8px;padding:11px;font:inherit;background:#fff;color:var(--ink);font-size:16px}input:focus{outline:3px solid #72bbaa66;border-color:var(--accent)}input[type=range]{padding:0;border:0;accent-color:var(--accent);height:28px;cursor:pointer}.range-label{display:flex!important;justify-content:space-between;align-items:center}.range-label output{color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums}.hint{font-size:11px;color:var(--muted);margin:6px 0 0}.multi{grid-column:span 2;border:0;margin:0;padding:0;min-width:0}.choices{display:flex;flex-wrap:wrap;gap:7px}.choice{position:relative}.choice input{position:absolute;opacity:0;pointer-events:none}.choice span{display:block;border:1px solid #c8d4ce;border-radius:999px;padding:8px 11px;background:#fff;font-size:13px;line-height:1;cursor:pointer;transition:.15s}.choice input:checked+span{background:#d9f0e9;border-color:var(--accent);color:#005345;font-weight:650}.calculator{grid-column:span 2;border:1px solid #c8d8d0;border-radius:11px;background:#f6fbf8;padding:12px}.calculator legend{padding:0 4px}.calculator-grid{display:grid;grid-template-columns:1fr 1fr auto;gap:9px;align-items:end}.calculator-grid label{font-size:11px}.calc-output{font-size:17px;font-weight:750;color:var(--accent);padding:10px 0;white-space:nowrap}.button{border:0;border-radius:8px;background:var(--accent);color:#fff;padding:11px 13px;font:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}.button:active{transform:translateY(1px)}.summary{margin:23px 0 12px;font-size:14px;color:var(--muted)}
+    .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:#fff}.results-table{border-collapse:collapse;width:100%;min-width:1080px;font-size:13px}.results-table th{background:#e7f0eb;color:#35564e;font-size:11px;letter-spacing:.01em;text-align:left;vertical-align:bottom;padding:11px 10px;white-space:nowrap;border-bottom:1px solid #c8d8d0}.results-table td{padding:12px 10px;vertical-align:top;border-bottom:1px solid var(--line);line-height:1.45}.results-table tbody tr:last-child td{border-bottom:0}.results-table tbody tr:hover{background:#f4faf7}.name-en{font-size:16px;line-height:1.2;font-weight:750;display:block}.name-zh,.muted{display:block;color:var(--muted);font-size:11px;margin-top:3px}.empty{padding:42px;text-align:center;color:var(--muted);border:1px dashed #b7c9c1;border-radius:12px;background:#fff}.foot{max-width:1180px;margin:0 auto;padding:0 24px 40px;color:var(--muted);font-size:12px;line-height:1.6}
+    @media(max-width:720px){header{padding:28px 20px}main{padding:16px}.fields{grid-template-columns:1fr 1fr;gap:13px}.field.search,.multi,.calculator{grid-column:1/-1}.choice span{padding:10px 12px;font-size:14px}.calculator-grid{grid-template-columns:1fr 1fr}.calculator-grid .button{grid-column:1/-1}.table-wrap{margin:0 -1px}.results-table{font-size:13px}}
+  </style>
+</head>
+<body>
+  <header><div class="eyebrow">个人课堂参考 · PERSONAL CLASSROOM REFERENCE · 64 MATERIALS</div><h1 class="title">宝石物性检索 <span lang="en">/ Gem Property Finder</span></h1><p class="sub">根据测得的折射率、比重与光性筛选候选材料。 / Filter possible gem materials by RI, SG, colour and optical character.</p></header>
+  <main>
+    <div class="notice">本工具按你提供的 GIA Gem Property Chart A（1992）照片建立，供个人学习与课堂使用。筛选结果是候选范围，不能替代完整鉴定流程；请结合显微镜、光谱、UV、内含物等复核。 / Built from your GIA Gem Property Chart A (1992) photos for personal classroom reference. Results are candidates only and require full gemological confirmation.</div>
+    <section class="panel" aria-label="筛选条件 / Filters">
+      <div class="fields">
+        <div class="field search"><label for="q">名称或别名（支持模糊搜索） / Name or alias (fuzzy search)</label><input id="q" type="search" placeholder="例如：翡翠、emerald、garnet"></div>
+        <fieldset class="multi"><legend>颜色（可多选） / Colour (multi-select)</legend><div class="choices" id="colorChoices">
+          <label class="choice"><input name="color" value="无色" type="checkbox"><span>无色 / Colourless</span></label><label class="choice"><input name="color" value="红" type="checkbox"><span>红 / Red</span></label><label class="choice"><input name="color" value="粉" type="checkbox"><span>粉 / Pink</span></label><label class="choice"><input name="color" value="橙" type="checkbox"><span>橙 / Orange</span></label><label class="choice"><input name="color" value="黄" type="checkbox"><span>黄 / Yellow</span></label><label class="choice"><input name="color" value="绿" type="checkbox"><span>绿 / Green</span></label><label class="choice"><input name="color" value="蓝" type="checkbox"><span>蓝 / Blue</span></label><label class="choice"><input name="color" value="紫" type="checkbox"><span>紫 / Violet</span></label><label class="choice"><input name="color" value="褐" type="checkbox"><span>褐 / Brown</span></label><label class="choice"><input name="color" value="黑" type="checkbox"><span>黑 / Black</span></label><label class="choice"><input name="color" value="白" type="checkbox"><span>白 / White</span></label>
+        </div></fieldset>
+        <fieldset class="multi"><legend>光性（可多选） / Optical character (multi-select)</legend><div class="choices" id="opticChoices">
+          <label class="choice"><input name="optic" value="SR" type="checkbox"><span>SR 单折射 / Singly refractive</span></label><label class="choice"><input name="optic" value="DR" type="checkbox"><span>DR 双折射 / Doubly refractive</span></label><label class="choice"><input name="optic" value="ADR" type="checkbox"><span>ADR 异常双折射 / Anomalous DR</span></label><label class="choice"><input name="optic" value="AGG" type="checkbox"><span>AGG 集合体 / Aggregate</span></label>
+        </div></fieldset>
+        <div class="field"><label for="ri">测得 RI / Measured RI</label><input id="ri" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" placeholder="例如 / e.g. 1.620"></div>
+        <div class="field"><label class="range-label" for="riTol">RI 误差 / RI tolerance ± <output id="riTolValue">0.000</output></label><input id="riTol" type="range" min="0" max="0.030" step="0.001" value="0"><p class="hint">拖动以扩大测量区间 / Drag to expand range</p></div>
+        <div class="field"><label for="sg">测得 SG / Measured SG</label><input id="sg" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" placeholder="例如 / e.g. 3.34"></div>
+        <div class="field"><label class="range-label" for="sgTol">SG 误差 / SG tolerance ± <output id="sgTolValue">0.000</output></label><input id="sgTol" type="range" min="0" max="0.50" step="0.001" value="0"><p class="hint">拖动以扩大测量区间 / Drag to expand range</p></div>
+        <fieldset class="calculator"><legend>SG 自动计算 / Automatic SG calculator</legend><div class="calculator-grid">
+          <div><label for="airWeight">空气中重量 / Weight in air</label><input id="airWeight" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" placeholder="例如 / e.g. 3.42"></div>
+          <div><label for="waterWeight">水中重量 / Weight in water</label><input id="waterWeight" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" placeholder="例如 / e.g. 2.40"></div>
+          <div class="calc-output" id="sgCalcResult">SG —</div>
+          <button class="button" id="useSg" type="button" disabled>使用此结果 / Use result</button>
+        </div></fieldset>
+      </div>
+    </section>
+    <p class="summary" id="summary"></p><div class="table-wrap"><table class="results-table" id="results"></table></div>
+  </main>
+  <footer class="foot">字段说明 / Key：RI = 折射率 / refractive index；SG = 比重 / specific gravity；DR = 双折射 / doubly refractive；SR = 单折射 / singly refractive；AGG = 集合体 / aggregate。数值以图表可读部分录入，并保留了范围概念；照片中被反光或手写遮挡的细项暂不作为自动排除依据。 / Values are transcribed from readable portions of the supplied chart and remain candidate-level reference data.</footer>
+  <script>
+  // 编号、英文名、中文名、RI低/高、SG低/高、硬度低/高、光性、晶系/结构、状态、别名
+  const rows = [
+   [1,'Hematite','赤铁矿',2.94,3.22,5.05,5.25,5.5,6.5,'AGG','六方晶系','natural','hematite'],
+   [2,'Synthetic rutile','合成金红石',2.616,2.903,4.23,4.29,6,6.5,'DR','四方晶系','synthetic','syn rutile'],
+   [3,'Diamond','钻石',2.417,2.417,3.51,3.53,10,10,'SR','立方晶系','natural','diamond'],
+   [4,'Strontium titanate','钛酸锶',2.409,2.409,5.10,5.16,5,6,'SR','立方晶系','synthetic','strontium titanate'],
+   [5,'Cubic zirconia','立方氧化锆',2.15,2.18,5.77,5.83,8,8.5,'SR','立方晶系','synthetic','CZ cubic zirconia'],
+   [6,'GGG','钆镓榴石',1.97,1.97,7.00,7.10,6.5,6.5,'SR','立方晶系','synthetic','gadolinium gallium garnet'],
+   [7,'Zircon','锆石',1.925,1.984,4.60,4.80,6,7.5,'DR','四方晶系','natural','zircon'],
+   [8,'Andradite','钙铁榴石',1.888,1.888,3.77,3.91,6.5,7.5,'SR','立方晶系','natural','andradite demantoid'],
+   [9,'YAG','钇铝榴石',1.833,1.833,4.49,4.61,7,8,'SR','立方晶系','synthetic','yttrium aluminum garnet'],
+   [10,'Spessartite','锰铝榴石',1.81,1.81,4.10,4.20,7,7.5,'SR','立方晶系','natural','spessartine garnet'],
+   [11,'Almandite','铁铝榴石',1.79,1.79,3.80,4.30,7,7.5,'SR','立方晶系','natural','almandine garnet'],
+   [12,'Corundum','刚玉',1.762,1.77,3.90,4.10,9,9,'DR','六方晶系','natural','ruby sapphire'],
+   [13,'Synthetic corundum (flame fusion)','合成刚玉（焰熔）',1.762,1.77,3.95,4.05,9,9,'DR','六方晶系','synthetic','synthetic sapphire ruby'],
+   [14,'Synthetic corundum (flux)','合成刚玉（助熔剂）',1.762,1.77,3.95,4.05,9,9,'DR','六方晶系','synthetic','flux synthetic corundum'],
+   [15,'Rhodolite','紫牙乌',1.76,1.78,3.74,3.94,7,7.5,'SR','立方晶系','natural','rhodolite garnet'],
+   [16,'Chrysoberyl','金绿宝石',1.746,1.755,3.74,3.92,7.5,8.5,'DR','斜方晶系','natural','alexandrite chrysoberyl'],
+   [17,'Pyrope','镁铝榴石',1.74,1.76,3.65,3.81,7,7.5,'SR','立方晶系','natural','pyrope garnet'],
+   [18,'Grossularite','钙铝榴石',1.72,1.76,3.61,3.78,7,7.5,'SR','立方晶系','natural','grossular garnet'],
+   [19,'Hydrogrossular','水钙铝榴石',1.72,1.72,3.57,3.65,7,7.5,'AGG','立方晶系','natural','hydrogrossular garnet'],
+   [20,'Rhodonite','蔷薇辉石',1.743,1.747,3.42,3.48,5.5,6.5,'DR','三斜晶系','natural','rhodonite'],
+   [21,'Synthetic spinel','合成尖晶石',1.728,1.728,3.58,3.62,8,8,'SR','立方晶系','synthetic','syn spinel'],
+   [22,'Spinel','尖晶石',1.718,1.718,3.58,3.64,8,8,'SR','立方晶系','natural','spinel'],
+   [23,'Idocrase','符山石',1.713,1.718,3.36,3.44,6,7,'DR','四方晶系','natural','vesuvianite idocrase'],
+   [24,'Zoisite','黝帘石',1.69,1.70,3.29,3.35,6.5,7,'DR','斜方晶系','natural','tanzanite zoisite'],
+   [25,'Diopside','透辉石',1.664,1.73,3.18,3.32,5.5,6.5,'DR','单斜晶系','natural','diopside'],
+   [26,'Spodumene','锂辉石',1.66,1.68,3.14,3.20,6.5,7,'DR','单斜晶系','natural','kunzite spodumene'],
+   [27,'Jadeite','硬玉',1.66,1.68,3.30,3.36,6.5,7,'AGG','单斜晶系','natural','jadeite 翡翠 jade'],
+   [28,'Jet','煤精',1.66,1.66,1.32,1.50,2.5,4,'SR','无定形','natural','jet'],
+   [29,'Malachite','孔雀石',1.655,1.909,3.80,4.05,3.5,4,'AGG','单斜晶系','natural','malachite'],
+   [30,'Peridot','橄榄石',1.654,1.69,3.20,3.48,6.5,7,'DR','斜方晶系','natural','olivine peridot'],
+   [31,'Andalusite','红柱石',1.634,1.643,3.13,3.21,7,7.5,'DR','斜方晶系','natural','andalusite'],
+   [32,'Tourmaline','电气石',1.624,1.644,3.00,3.12,7,7.5,'DR','六方晶系','natural','tourmaline'],
+   [33,'Topaz','黄玉',1.619,1.627,3.49,3.57,8,8,'DR','斜方晶系','natural','topaz'],
+   [34,'Turquoise','绿松石',1.61,1.65,2.40,3.12,5,6,'AGG','三斜晶系','natural','turquoise'],
+   [35,'Nephrite','软玉',1.606,1.632,2.80,3.10,6,6.5,'AGG','单斜晶系','natural','nephrite 和田玉 jade'],
+   [36,'Rhodochrosite','菱锰矿',1.597,1.817,3.45,3.75,3.5,4.5,'DR','六方晶系','natural','rhodochrosite'],
+   [37,'Beryl','绿柱石',1.577,1.583,2.67,2.77,7.5,8,'DR','六方晶系','natural','beryl emerald aquamarine'],
+   [38,'Synthetic emerald (hydrothermal)','合成祖母绿（水热法）',1.568,1.573,2.65,2.71,7.5,8,'DR','六方晶系','synthetic','hydrothermal synthetic emerald'],
+   [39,'Synthetic emerald (flux)','合成祖母绿（助熔剂法）',1.561,1.564,2.63,2.69,7.5,8,'DR','六方晶系','synthetic','flux synthetic emerald'],
+   [40,'Serpentine','蛇纹石',1.56,1.57,2.44,2.80,2,6,'AGG','单斜晶系','natural','serpentine'],
+   [41,'Coral (conchiolin)','珊瑚（角质）',1.56,1.57,1.30,2.12,3,3,'AGG','有机集合体','natural','coral conchiolin'],
+   [42,'Labradorite','拉长石',1.559,1.568,2.65,2.75,6,6.5,'DR','三斜晶系','natural','labradorite feldspar'],
+   [43,'Tortoise shell','玳瑁',1.55,1.55,1.26,1.32,2.5,2.5,'SR','无定形','natural','tortoise shell'],
+   [44,'Quartz','石英',1.544,1.553,2.64,2.68,7,7,'DR','六方晶系','natural','quartz amethyst citrine'],
+   [45,'Iolite','堇青石',1.542,1.551,2.56,2.66,7,7.5,'DR','斜方晶系','natural','cordierite iolite'],
+   [46,'Ivory','象牙',1.54,1.54,1.70,2.00,2.5,2.5,'AGG','有机集合体','natural','ivory'],
+   [47,'Amber','琥珀',1.54,1.54,1.00,1.16,2,2.5,'SR','无定形','natural','amber'],
+   [48,'Oligoclase','奥长石',1.539,1.547,2.60,2.70,6,6.5,'DR','三斜晶系','natural','oligoclase feldspar'],
+   [49,'Chalcedony','玉髓',1.535,1.539,2.55,2.65,6.5,7,'AGG','隐晶质集合体','natural','chalcedony'],
+   [50,'Pearl','珍珠',1.53,1.685,2.61,2.85,2.5,4,'AGG','有机集合体','natural','pearl natural cultured'],
+   [51,'Shell','贝壳',1.53,1.685,2.83,2.89,3.5,3.5,'AGG','有机集合体','natural','shell mother of pearl'],
+   [52,'Microcline','微斜长石',1.522,1.53,2.54,2.58,6,6.5,'DR','三斜晶系','natural','microcline feldspar amazonite'],
+   [53,'Orthoclase','正长石',1.518,1.526,2.55,2.61,6,6.5,'DR','单斜晶系','natural','orthoclase feldspar'],
+   [54,'Lapis lazuli','青金石',1.50,1.67,2.50,3.00,5,6,'AGG','岩石／集合体','natural','lapis lazuli'],
+   [55,'Obsidian','黑曜石',1.49,1.49,2.33,2.47,5,5.5,'SR','无定形','natural','obsidian natural glass'],
+   [56,'Moldavite','摩尔达维石',1.49,1.49,2.32,2.40,5.5,5.5,'SR','无定形','natural','moldavite natural glass'],
+   [57,'Calcite','方解石',1.486,1.658,2.65,2.75,3,3,'DR','六方晶系','natural','calcite'],
+   [58,'Coral (calcareous)','珊瑚（钙质）',1.486,1.658,2.60,2.70,3.5,4,'AGG','有机集合体','natural','coral calcareous'],
+   [59,'Sodalite','方钠石',1.483,1.483,2.15,2.35,5,6,'SR','立方晶系','natural','sodalite'],
+   [60,'Opal','蛋白石',1.45,1.45,2.07,2.23,5,6.5,'SR','无定形','natural','opal'],
+   [61,'Glass','玻璃',1.47,1.70,2.30,4.50,5,6,'SR','无定形','synthetic','man made glass'],
+   [62,'Plastic','塑料',1.46,1.70,1.05,1.55,1.5,3,'SR','无定形','synthetic','plastic'],
+   [63,'Fluorite','萤石',1.434,1.434,3.11,3.25,4,4,'SR','立方晶系','natural','fluorite'],
+   [64,'Assembled stone','拼合石',null,null,null,null,null,null,'','多材料','synthetic','doublet triplet assembled stone']
+  ].map(([n,en,zh,ril,rih,sgl,sgh,hl,hh,optic,system,status,aliases])=>({n,en,zh,ril,rih,sgl,sgh,hl,hh,optic,system,status,aliases}));
+  const colorByNumber={
+    1:'黑 褐 红',2:'无色 黄 褐',3:'无色 黄 褐',4:'无色 黄 褐',5:'无色 粉 红 橙 黄 绿 蓝 紫 褐',6:'无色 黄 绿 蓝',7:'无色 黄 褐 红 蓝 绿',8:'黄 绿 褐 黑',9:'无色 黄 绿 蓝',10:'红 橙 黄 褐',11:'红 紫 褐',12:'无色 红 粉 紫 蓝 黄 绿',13:'无色 红 粉 紫 蓝 黄 绿',14:'无色 红 粉 紫 蓝 黄 绿',15:'粉 紫 红',16:'无色 黄 绿 褐',17:'红 紫',18:'无色 黄 橙 绿 褐',19:'绿 粉',20:'粉 红 褐 黑',21:'无色 蓝 绿 紫',22:'无色 红 粉 紫 蓝',23:'绿 黄 褐',24:'蓝 紫 绿',25:'无色 绿',26:'无色 粉 紫 黄 绿',27:'白 绿',28:'黑 褐',29:'绿',30:'黄 绿 褐',31:'红 橙 黄 绿 褐',32:'无色 红 粉 橙 黄 绿 蓝 紫 褐 黑',33:'无色 黄 蓝 粉',34:'蓝 绿',35:'白 绿 褐',36:'粉 红 褐',37:'无色 绿 蓝 黄 粉',38:'绿',39:'绿',40:'绿 黄 褐',41:'红 橙 粉 白',42:'蓝 绿 灰',43:'褐 黑 黄',44:'无色 紫 红 黄 褐 绿 蓝',45:'蓝 紫 灰',46:'白 黄 褐',47:'黄 橙 红 褐',48:'白 黄 橙',49:'无色 白 灰 褐 绿 蓝 红',50:'白 粉 黄 褐 黑',51:'白 粉 黄 褐 黑',52:'白 绿 蓝',53:'无色 白 黄 粉',54:'蓝',55:'黑 褐 红',56:'绿 黄 褐',57:'无色 白 黄 橙 红 绿 蓝 紫',58:'红 粉 白',59:'蓝 紫',60:'无色 白 黑 红 橙 黄 绿 蓝 紫',61:'无色 红 橙 黄 绿 蓝 紫 褐',62:'无色 红 橙 黄 绿 蓝 紫 褐 黑 白',63:'无色 紫 蓝 绿 黄',64:'无色 红 橙 黄 绿 蓝 紫 褐 黑 白'
+  };
+  const adrNumbers=new Set([3,7,8,9,10,11,15,17,18,19,21,22]);
+  rows.forEach(x=>{x.colors=colorByNumber[x.n]||'';x.optics=adrNumbers.has(x.n)?`${x.optic} ADR`:x.optic});
+  const colorEnglish={无色:'Colourless',红:'Red',粉:'Pink',橙:'Orange',黄:'Yellow',绿:'Green',蓝:'Blue',紫:'Violet',褐:'Brown',黑:'Black',白:'White',灰:'Gray'};
+  const systemEnglish={六方晶系:'Hexagonal',四方晶系:'Tetragonal',立方晶系:'Cubic',斜方晶系:'Orthorhombic',单斜晶系:'Monoclinic',三斜晶系:'Triclinic',无定形:'Amorphous',有机集合体:'Organic aggregate',隐晶质集合体:'Cryptocrystalline aggregate','岩石／集合体':'Rock / aggregate',多材料:'Composite material'};
+  const transparencyByNumber={1:'O / Opaque',2:'Tp / Transparent',3:'Tp–O / Transparent–opaque',4:'Tp / Transparent',5:'Tp / Transparent',6:'Tp / Transparent',7:'Tp–S-Tp / Transparent–semitransparent',8:'Tp–O / Transparent–opaque',9:'Tp / Transparent',10:'Tp / Transparent',11:'Tp–S-Tl / Transparent–translucent',12:'Tp–O / Transparent–opaque',13:'Tp / Transparent',14:'Tp / Transparent',15:'Tp / Transparent',16:'Tp–O / Transparent–opaque',17:'Tp / Transparent',18:'Tp–S-Tp / Transparent–semitransparent',19:'Tl–O / Translucent–opaque',20:'Tp–O / Transparent–opaque',21:'Tp / Transparent',22:'Tp–O / Transparent–opaque',23:'Tp–O / Transparent–opaque',24:'Tp–O / Transparent–opaque',25:'Tp–O / Transparent–opaque',26:'Tp–O / Transparent–opaque',27:'S-Tp–O / Semitransparent–opaque',28:'S-Tl–O / Translucent–opaque',29:'S-Tp–O / Semitransparent–opaque',30:'Tp / Transparent',31:'Tp–O / Transparent–opaque',32:'Tp–O / Transparent–opaque',33:'Tp / Transparent',34:'S-Tl–O / Translucent–opaque',35:'Tl–O / Translucent–opaque',36:'Tp–O / Transparent–opaque',37:'Tp–O / Transparent–opaque',38:'Tp / Transparent',39:'Tp / Transparent',40:'S-Tp–O / Semitransparent–opaque',41:'S-Tl–O / Translucent–opaque',42:'Tp–O / Transparent–opaque',43:'S-Tp–Tl / Semitransparent–translucent',44:'Tp–O / Transparent–opaque',45:'Tp–Tl / Transparent–translucent',46:'Tl–O / Translucent–opaque',47:'Tp–O / Transparent–opaque',48:'Tp–S-Tl / Transparent–semitranslucent',49:'S-Tp–O / Semitransparent–opaque',50:'Tl–O / Translucent–opaque',51:'Tl–O / Translucent–opaque',52:'Tl–O / Translucent–opaque',53:'Tp–S-Tl / Transparent–semitranslucent',54:'S-Tl–O / Semitranslucent–opaque',55:'Tp–O / Transparent–opaque',56:'Tp–S-Tp / Transparent–semitransparent',57:'Tp–O / Transparent–opaque',58:'S-Tl–O / Semitranslucent–opaque',59:'S-Tp–O / Semitransparent–opaque',60:'Tp–O / Transparent–opaque',61:'Tp–O / Transparent–opaque',62:'Tp–O / Transparent–opaque',63:'Tp–Tl / Transparent–translucent',64:'Tp–O / Transparent–opaque'};
+  const $=id=>document.getElementById(id), fmt=(a,b,d=3)=>a==null?'—':a===b?a.toFixed(d):`${a.toFixed(d)}–${b.toFixed(d)}`;
+  function render(){const q=$('q').value.trim().toLowerCase(),colors=[...document.querySelectorAll('input[name="color"]:checked')].map(x=>x.value),optics=[...document.querySelectorAll('input[name="optic"]:checked')].map(x=>x.value),ri=$('ri').value.trim().replace(',','.'),riTol=$('riTol').value,sg=$('sg').value.trim().replace(',','.'),sgTol=$('sgTol').value;
+   $('riTolValue').value=Number(riTol).toFixed(3);$('sgTolValue').value=Number(sgTol).toFixed(3);
+   const used=v=>v!==''&&!Number.isNaN(Number(v)), fuzzy=(query,text)=>{if(!query)return true;const target=text.replace(/[\s()\-]/g,'').toLowerCase(),needle=query.replace(/[\s()\-]/g,'');if(target.includes(needle))return true;let i=0;for(const char of target)if(char===needle[i])i++;return i===needle.length},rangeMatches=(measured,tolerance,low,high)=>!used(measured)||(low!=null&&low<=Number(measured)+Number(tolerance)&&high>=Number(measured)-Number(tolerance)), list=rows.filter(x=>{const text=`${x.en} ${x.zh} ${x.aliases}`;return fuzzy(q,text)&&(colors.length===0||colors.some(color=>x.colors.includes(color)))&&rangeMatches(ri,riTol,x.ril,x.rih)&&rangeMatches(sg,sgTol,x.sgl,x.sgh)&&(optics.length===0||optics.some(optic=>x.optics.split(' ').includes(optic)));});
+   const errorText=(v,t,d)=>used(v)?` ${Number(v).toFixed(d)}${Number(t)>0?` ± ${Number(t).toFixed(d)}`:''}`:'';
+   $('summary').textContent=`找到 ${list.length} 个候选材料 / ${list.length} candidate materials${q?' · 名称模糊搜索 / fuzzy name search':''}${colors.length?` · 颜色 / colour: ${colors.join('、')}`:''}${optics.length?` · 光性 / optical: ${optics.join('、')}`:''}${errorText(ri,riTol,3)?` · RI${errorText(ri,riTol,3)}`:''}${errorText(sg,sgTol,3)?` · SG${errorText(sg,sgTol,3)}`:''}`;
+   const bilingualColours=value=>value?value.split(' ').map(c=>`${c} / ${colorEnglish[c]||c}`).join(' · '):'—';
+   $('results').innerHTML=list.length?`<thead><tr><th>#<br>编号</th><th>宝石材料<br>Gem material</th><th>颜色范围<br>Colour range</th><th>透明度<br>Transparency</th><th>折射率 RI<br>Refractive index</th><th>比重 SG<br>Specific gravity</th><th>莫氏硬度<br>Mohs hardness</th><th>光性<br>Optical character</th><th>晶系／结构<br>Crystal system / structure</th></tr></thead><tbody>${list.map(x=>`<tr><td>${x.n}</td><td><span class="name-en">${x.en}</span><span class="name-zh">${x.zh}</span></td><td>${bilingualColours(x.colors)}</td><td>${transparencyByNumber[x.n]||'—'}</td><td>${fmt(x.ril,x.rih)}</td><td>${fmt(x.sgl,x.sgh,2)}</td><td>${x.hl==null?'—':x.hl===x.hh?x.hl:`${x.hl}–${x.hh}`}</td><td>${x.optics||'—'}</td><td>${x.system}<span class="name-zh">${systemEnglish[x.system]||'—'}</span></td></tr>`).join('')}</tbody>`:`<tbody><tr><td class="empty" colspan="9">没有相符候选。可稍微放宽 RI、SG 误差，或清除其中一个筛选条件。<br>No matches. Widen RI/SG tolerance or remove a filter.</td></tr></tbody>`;
+  }
+  function updateSgCalculator(){const air=Number($('airWeight').value.trim().replace(',','.')),water=Number($('waterWeight').value.trim().replace(',','.')),valid=Number.isFinite(air)&&Number.isFinite(water)&&air>water&&water>0,result=valid?air/(air-water):null;$('sgCalcResult').textContent=result==null?'SG —':`SG ${result.toFixed(3)}`;$('useSg').disabled=result==null;$('useSg').dataset.result=result==null?'':result.toFixed(3);}
+  ['q','ri','riTol','sg','sgTol'].forEach(id=>$(id).addEventListener('input',render));['airWeight','waterWeight'].forEach(id=>$(id).addEventListener('input',updateSgCalculator));$('useSg').addEventListener('click',()=>{const result=$('useSg').dataset.result;if(result){$('sg').value=result;render();$('sg').focus();}});document.querySelectorAll('input[name="color"],input[name="optic"]').forEach(el=>el.addEventListener('change',render));updateSgCalculator();render();
+  </script>
+</body></html>
