@@ -90,10 +90,10 @@
           <label class="choice"><input name="optic" value="SR" type="checkbox"><span><b>SR 单折射</b><i class="bi-separator"> / </i><small lang="en">Singly refractive</small></span></label><label class="choice"><input name="optic" value="DR" type="checkbox"><span><b>DR 双折射</b><i class="bi-separator"> / </i><small lang="en">Doubly refractive</small></span></label><label class="choice"><input name="optic" value="ADR" type="checkbox"><span><b>ADR 异常双折射</b><i class="bi-separator"> / </i><small lang="en">Anomalous DR</small></span></label><label class="choice"><input name="optic" value="AGG" type="checkbox"><span><b>AGG 集合体</b><i class="bi-separator"> / </i><small lang="en">Aggregate</small></span></label>
         </div></fieldset>
         <fieldset class="multi"><legend>透明度（可多选） / Transparency (multi-select) · <span id="transSelection">不限 / Any</span></legend><div class="choices">
-        <label class="choice"><input name="trans" value="Tp" type="checkbox"><span><b>Tp 透明</b><i class="bi-separator"> / </i><small lang="en">Transparent</small></span></label>
-        <label class="choice"><input name="trans" value="S-Tp" type="checkbox"><span><b>S-Tp 亚透明</b><i class="bi-separator"> / </i><small lang="en">Semitransparent</small></span></label>
-        <label class="choice"><input name="trans" value="Tl" type="checkbox"><span><b>Tl 半透明</b><i class="bi-separator"> / </i><small lang="en">Translucent</small></span></label>
-        <label class="choice"><input name="trans" value="S-Tl" type="checkbox"><span><b>S-Tl 微透明</b><i class="bi-separator"> / </i><small lang="en">Semitranslucent</small></span></label>
+        <label class="choice"><input name="trans" value="Tp" type="checkbox"><span><b>TP 透明</b><i class="bi-separator"> / </i><small lang="en">Transparent</small></span></label>
+        <label class="choice"><input name="trans" value="S-Tp" type="checkbox"><span><b>STP 亚透明</b><i class="bi-separator"> / </i><small lang="en">Semitransparent</small></span></label>
+        <label class="choice"><input name="trans" value="Tl" type="checkbox"><span><b>TL 半透明</b><i class="bi-separator"> / </i><small lang="en">Translucent</small></span></label>
+        <label class="choice"><input name="trans" value="S-Tl" type="checkbox"><span><b>STL 微透明</b><i class="bi-separator"> / </i><small lang="en">Semitranslucent</small></span></label>
         <label class="choice"><input name="trans" value="O" type="checkbox"><span><b>O 不透明</b><i class="bi-separator"> / </i><small lang="en">Opaque</small></span></label>
       </div></fieldset>
         <div class="field"><label for="ri">测得 RI / Measured RI</label><input id="ri" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" placeholder="例如 / e.g. 1.620"></div>
@@ -141,6 +141,7 @@
   const pairText=p=>p[0]===p[1]?p[0]:p[0]+' / '+p[1];
   const sourceBlank=pairText(chartVocabulary.blank);
   const transWords={Tp:'透明 / Transparent','S-Tp':'亚透明 / Semitransparent',Tl:'半透明 / Translucent','S-Tl':'微透明 / Semitranslucent',O:'不透明 / Opaque'};
+  const transLabel=value=>value.split('–').map(t=>({Tp:'TP','S-Tp':'STP',Tl:'TL','S-Tl':'STL',O:'O'}[t]||t)).join('–');
   const transparencyOrder=['Tp','S-Tp','Tl','S-Tl','O'];
   function transparencyMatches(source,selected){
     if(!selected.length)return true;
@@ -176,7 +177,7 @@
        ['少见颜色（竖线） / Uncommon colours (vertical line)',bilingualColours(d.uncommon)],
        ['修饰色（半格） / Modifying colours (half box)',bilingualColours(d.modifier)],
        ['颜色说明 / Colour note',chartDyed.has(x.n)?'可能染色 / May be dyed':sourceBlank],
-       ['透明度 / Transparency',d.trans+' · '+d.trans.split('–').map(t=>transWords[t]).join(' → ')],
+       ['透明度 / Transparency',transLabel(d.trans)+' · '+d.trans.split('–').map(t=>transWords[t]).join(' → ')],
        ['现象及其他外观特征 / Phenomena and distinctive visual characteristics',pairText(d.phenomena)],
        ['RI 标准值 / RI Norm',d.norm==='Any'?'任意 / Any':d.norm],
        ['RI 原表变化范围 / RI Range',x.n===44?'± 0.000（原表明确标注 / explicitly printed）':variation(d.plus,d.minus)],
@@ -197,7 +198,7 @@
        ['原表备注 / Source comments',pairText(d.comments)],
      ];
      const detail=open?`<tr id="detail-${x.n}"><td colspan="9"><div class="gem-details"><h3>${x.en} <small>${x.zh}</small></h3><dl>${properties.map(([k,v])=>`<div><dt>${k}</dt><dd>${escapeHtml(v)}</dd></div>`).join('')}</dl></div></td></tr>`:'';
-     return `<tr>${control}<td><span class="name-en">${x.en}</span><span class="name-zh">${x.zh}</span></td><td class="colour-cell">${colourDots(x.colors)}</td><td class="trans-cell"><strong>${d.trans}</strong><span>${escapeHtml(d.trans.split('–').map(t=>transWords[t].split(' / ')[0]).join('–'))}</span><small lang="en">${escapeHtml(d.trans.split('–').map(t=>transWords[t].split(' / ')[1]).join('–'))}</small></td><td>${intervalText(x.riIntervals)}</td><td>${intervalText(x.sgIntervals)}</td><td>${x.optics||'—'}</td><td><button class="small-button detail-action" data-id="${x.n}" aria-expanded="${open}" aria-controls="detail-${x.n}">${open?'收起 / Close':'展开 / Details'}</button></td></tr>${detail}`;
+     return `<tr>${control}<td><span class="name-en">${x.en}</span><span class="name-zh">${x.zh}</span></td><td class="colour-cell">${colourDots(x.colors)}</td><td class="trans-cell"><strong>${transLabel(d.trans)}</strong><span>${escapeHtml(d.trans.split('–').map(t=>transWords[t].split(' / ')[0]).join('–'))}</span><small lang="en">${escapeHtml(d.trans.split('–').map(t=>transWords[t].split(' / ')[1]).join('–'))}</small></td><td>${intervalText(x.riIntervals)}</td><td>${intervalText(x.sgIntervals)}</td><td>${x.optics||'—'}</td><td><button class="small-button detail-action" data-id="${x.n}" aria-expanded="${open}" aria-controls="detail-${x.n}">${open?'收起 / Close':'展开 / Details'}</button></td></tr>${detail}`;
    }).join('')}</tbody>`:`<tbody><tr><td class="empty" colspan="9">没有相符候选 / No matching candidates.</td></tr></tbody>`;
    document.querySelectorAll('.detail-action').forEach(button=>button.addEventListener('click',()=>{const id=Number(button.dataset.id);expandedIds.has(id)?expandedIds.delete(id):expandedIds.add(id);render();}));
    document.querySelectorAll('.candidate-action').forEach(button=>button.addEventListener('click',()=>{const id=Number(button.dataset.id);if(hiddenIds.has(id))hiddenIds.delete(id);else hiddenIds.add(id);render();}));
