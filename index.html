@@ -94,7 +94,7 @@
         <label class="choice"><input name="trans" value="S-Tp" type="checkbox"><span><b>STP 亚透明</b><i class="bi-separator"> / </i><small lang="en">Semitransparent</small></span></label>
         <label class="choice"><input name="trans" value="Tl" type="checkbox"><span><b>TL 半透明</b><i class="bi-separator"> / </i><small lang="en">Translucent</small></span></label>
         <label class="choice"><input name="trans" value="S-Tl" type="checkbox"><span><b>STL 微透明</b><i class="bi-separator"> / </i><small lang="en">Semitranslucent</small></span></label>
-        <label class="choice"><input name="trans" value="O" type="checkbox"><span><b>O 不透明</b><i class="bi-separator"> / </i><small lang="en">Opaque</small></span></label>
+        <label class="choice"><input name="trans" value="O" type="checkbox"><span><b>OP 不透明</b><i class="bi-separator"> / </i><small lang="en">Opaque</small></span></label>
       </div></fieldset>
         <div class="field"><label for="ri">测得 RI / Measured RI</label><input id="ri" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" placeholder="例如 / e.g. 1.620"></div>
         <div class="field"><label class="range-label" for="riTol">RI 误差 / RI tolerance ± <output id="riTolValue">0.000</output></label><input id="riTol" type="range" min="0" max="0.300" step="0.001" value="0"><p class="hint">拖动以扩大测量区间 / Drag to expand range</p></div>
@@ -141,7 +141,7 @@
   const pairText=p=>p[0]===p[1]?p[0]:p[0]+' / '+p[1];
   const sourceBlank=pairText(chartVocabulary.blank);
   const transWords={Tp:'透明 / Transparent','S-Tp':'亚透明 / Semitransparent',Tl:'半透明 / Translucent','S-Tl':'微透明 / Semitranslucent',O:'不透明 / Opaque'};
-  const transLabel=value=>value.split('–').map(t=>({Tp:'TP','S-Tp':'STP',Tl:'TL','S-Tl':'STL',O:'O'}[t]||t)).join('–');
+  const transLabel=value=>value.split('–').map(t=>({Tp:'TP','S-Tp':'STP',Tl:'TL','S-Tl':'STL',O:'OP'}[t]||t)).join('–');
   const transparencyOrder=['Tp','S-Tp','Tl','S-Tl','O'];
   function transparencyMatches(source,selected){
     if(!selected.length)return true;
@@ -157,7 +157,7 @@
 
   const $=id=>document.getElementById(id), fmt=(a,b,d=3)=>a==null?'—':a===b?a.toFixed(d):`${a.toFixed(d)}–${b.toFixed(d)}`;
   const hiddenIds=new Set([64]), expandedIds=new Set();
-  function render(){const trans=[...document.querySelectorAll('input[name="trans"]:checked')].map(x=>x.value);$('transSelection').textContent=trans.length?trans.join(' · '):'不限 / Any';const q=$('q').value.trim().toLowerCase(),colors=[...document.querySelectorAll('input[name="color"]:checked')].map(x=>x.value),optics=[...document.querySelectorAll('input[name="optic"]:checked')].map(x=>x.value),ri=$('ri').value.trim().replace(',','.'),riTol=$('riTol').value,sg=$('sg').value.trim().replace(',','.'),sgTol=$('sgTol').value;
+  function render(){const trans=[...document.querySelectorAll('input[name="trans"]:checked')].map(x=>x.value);$('transSelection').textContent=trans.length?trans.map(transLabel).join(' · '):'不限 / Any';const q=$('q').value.trim().toLowerCase(),colors=[...document.querySelectorAll('input[name="color"]:checked')].map(x=>x.value),optics=[...document.querySelectorAll('input[name="optic"]:checked')].map(x=>x.value),ri=$('ri').value.trim().replace(',','.'),riTol=$('riTol').value,sg=$('sg').value.trim().replace(',','.'),sgTol=$('sgTol').value;
    $('riTolValue').value=Number(riTol).toFixed(3);$('sgTolValue').value=Number(sgTol).toFixed(3);
    const used=v=>v!==''&&!Number.isNaN(Number(v)), fuzzy=(query,text)=>{if(!query)return true;const target=text.replace(/[\s()\-]/g,'').toLowerCase(),needle=query.replace(/[\s()\-]/g,'');if(target.includes(needle))return true;let i=0;for(const char of target)if(char===needle[i])i++;return i===needle.length},rangeMatches=(measured,tolerance,intervals)=>!used(measured)||intervals===null||intervals.some(([low,high])=>low<=Number(measured)+Number(tolerance)+1e-9&&high>=Number(measured)-Number(tolerance)-1e-9), matched=rows.filter(x=>{const text=`${x.en} ${x.zh} ${x.aliases}`;return transparencyMatches(x.chart.trans,trans)&&fuzzy(q,text)&&(colors.length===0||colors.some(color=>x.colors.split(' ').includes(color)))&&rangeMatches(ri,riTol,x.riIntervals)&&rangeMatches(sg,sgTol,x.sgIntervals)&&(optics.length===0||optics.some(optic=>x.optics.split(' ').includes(optic)));}), excluded=matched.filter(x=>hiddenIds.has(x.n)),list=matched;
    const errorText=(v,t,d)=>used(v)?` ${Number(v).toFixed(d)}${Number(t)>0?` ± ${Number(t).toFixed(d)}`:''}`:'';
