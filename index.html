@@ -6,6 +6,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23006d5b' d='M32 4 56 28 32 60 8 28z'/%3E%3Cpath fill='%23fff' d='m32 14 12 14-12 22-12-22z'/%3E%3C/svg%3E">
   <title>宝石物性检索 · Chart A + B</title>
   <style>
+    .input-error{display:block;color:#a32121;font-size:12px;line-height:1.5;margin-top:5px}.input-error:empty{display:none}input[aria-invalid=true]{border-color:#a32121}
     :root{--ink:#1d2927;--muted:#63716e;--line:#dce4df;--paper:#f7f8f4;--accent:#006d5b;--warm:#dd9b33;--card:#fff}
     *{box-sizing:border-box} body{margin:0;background:var(--paper);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC",sans-serif;color:var(--ink)}
     header{padding:40px max(24px,calc((100vw - 1180px)/2));background:#123c36;color:#fff}.eyebrow{font-size:12px;letter-spacing:.11em;opacity:.72}.title{margin:8px 0 6px;font-size:clamp(26px,4vw,42px);letter-spacing:-.04em}.sub{margin:0;color:#d7e6df;font-size:15px}
@@ -139,10 +140,10 @@
         <fieldset class="multi"><legend>荧光（可多选） / Fluorescence (multi-select)</legend><div class="choices" id="uvChoices">
           <label class="choice"><input name="uv" value="LW" type="checkbox"><span title="长波 / Long-wave">LW</span></label>
           <label class="choice"><input name="uv" value="SW" type="checkbox"><span title="短波 / Short-wave">SW</span></label>
-        </div><p class="hint">LW 长波 / Long-wave · SW 短波 / Short-wave。选择可能有荧光的波段；双选匹配任一波段，未知保留。/ Select possible fluorescence; either band matches, unknowns retained.</p></fieldset>
-        <div class="field"><label for="ri">测得 RI / Measured RI</label><input id="ri" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" placeholder="例如 / e.g. 1.620"></div>
+        </div><p class="hint">LW 长波 / Long-wave · SW 短波 / Short-wave。按手动校对选择筛选：✓ 有，— 无；双选匹配任一波段。/ Uses saved selections: ✓ yes, — no; either selected band matches.</p></fieldset>
+        <div class="field"><label for="ri">测得 RI / Measured RI</label><input id="ri" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" aria-describedby="riError" placeholder="例如 / e.g. 1.620"><span id="riError" class="input-error" role="status"></span></div>
         <div class="field"><label class="range-label" for="riTol">RI 误差 / RI tolerance ± <output id="riTolValue">0.000</output></label><input id="riTol" type="range" min="0" max="0.300" step="0.001" value="0"><p class="hint">拖动以扩大测量区间 / Drag to expand range</p></div>
-        <div class="field"><label for="sg">测得 SG / Measured SG</label><input id="sg" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" placeholder="例如 / e.g. 3.34"></div>
+        <div class="field"><label for="sg">测得 SG / Measured SG</label><input id="sg" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" aria-describedby="sgError" placeholder="例如 / e.g. 3.34"><span id="sgError" class="input-error" role="status"></span></div>
         <div class="field"><label class="range-label" for="sgTol">SG 误差 / SG tolerance ± <output id="sgTolValue">0.000</output></label><input id="sgTol" type="range" min="0" max="0.50" step="0.001" value="0"><p class="hint">拖动以扩大测量区间 / Drag to expand range</p></div>
         <fieldset class="calculator"><legend>SG 自动计算 / Automatic SG calculator</legend><div class="calculator-grid">
           <div><label for="airWeight">空气中重量 / Weight in air</label><input id="airWeight" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" placeholder="例如 / e.g. 3.42"></div>
@@ -201,9 +202,20 @@
     const values=chartIntervals(source,0,0).filter(pair=>pair.every(v=>Number.isFinite(v)&&v>0));
     return values.length?values:null;
   }
+  function positiveDecimal(value){
+    const text=String(value).trim().replace(',','.');
+    if(!/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(text))return null;
+    const number=Number(text);return Number.isFinite(number)&&number>0?number:null;
+  }
+  function measuredInput(id){
+    const raw=$(id).value.trim(),value=positiveDecimal(raw),invalid=raw!==''&&value===null;
+    $(id).setAttribute('aria-invalid',String(invalid));
+    $(id+'Error').textContent=invalid?'请输入有效正数；此项暂不参与筛选 / Enter a finite positive decimal; this filter is skipped.':'';
+    return value===null?'':raw.replace(',','.');
+  }
   function numericMatchDistance(intervals,value){
-    const measured=Number(value);
-    if(value===''||!Number.isFinite(measured)||measured<=0||!intervals?.length)return null;
+    const measured=positiveDecimal(value);
+    if(measured===null||!intervals?.length)return null;
     const distance=Math.min(...intervals.map(([low,high])=>Math.abs((low+high)/2-measured)));
     return (distance<1e-9?0:distance)/measured;
   }
@@ -214,7 +226,7 @@
     return Math.min(99.99,100/(1+distance)).toFixed(2)+'%';
   }
   function sortByNumericMatch(list,ri,sg){
-    const inputs=[['riIntervals',ri],['sgIntervals',sg]].filter(([,v])=>v!==''&&Number.isFinite(Number(v))&&Number(v)>0);
+    const inputs=[['riIntervals',ri],['sgIntervals',sg]].filter(([,v])=>positiveDecimal(v)!==null);
     if(!inputs.length)return list;
     const scored=list.map((row,index)=>{
       let missing=0,total=0;
@@ -234,7 +246,7 @@
     return scored.map(x=>x.row);
   }
   const uvSummary=d=>Object.entries(ReviewModel.uvBands(d)).map(([b,v])=>b+' '+(v===null?'? 未知 / Unknown':v?'✓':'—')).join(' · ');
-  function render(){const trans=[...document.querySelectorAll('input[name="trans"]:checked')].map(x=>x.value);$('transSelection').textContent=trans.length?trans.map(transLabel).join(' · '):'不限 / Any';const q=$('q').value.trim().toLowerCase(),colors=[...document.querySelectorAll('input[name="color"]:checked')].map(x=>x.value),optics=[...document.querySelectorAll('input[name="optic"]:checked')].map(x=>x.value),ri=$('ri').value.trim().replace(',','.'),riTol=$('riTol').value,sg=$('sg').value.trim().replace(',','.'),sgTol=$('sgTol').value;
+  function render(){const trans=[...document.querySelectorAll('input[name="trans"]:checked')].map(x=>x.value);$('transSelection').textContent=trans.length?trans.map(transLabel).join(' · '):'不限 / Any';const q=$('q').value.trim().toLowerCase(),colors=[...document.querySelectorAll('input[name="color"]:checked')].map(x=>x.value),optics=[...document.querySelectorAll('input[name="optic"]:checked')].map(x=>x.value),ri=measuredInput('ri'),riTol=$('riTol').value,sg=measuredInput('sg'),sgTol=$('sgTol').value;
    $('riTolValue').value=Number(riTol).toFixed(3);$('sgTolValue').value=Number(sgTol).toFixed(3);
    const uv=[...document.querySelectorAll('input[name="uv"]:checked')].map(x=>x.value);
    const scope=[...document.querySelectorAll('input[name="chart"]:checked')][0]?.value||'all';
@@ -259,7 +271,7 @@
        ['常见颜色（横线） / Common colours (horizontal line)',bilingualColours(d.common)],
        ['少见颜色（竖线） / Uncommon colours (vertical line)',bilingualColours(d.uncommon)],
        ['修饰色（半格） / Modifying colours (half box)',bilingualColours(d.modifier)],
-       ['颜色说明 / Colour note',d.colourNote||(chartDyed.has(x.n)?'可能染色 / May be dyed':sourceBlank)],
+       ['颜色说明 / Colour note',d.colourNote||(!d.reviewedRange&&chartDyed.has(x.n)?'可能染色 / May be dyed':sourceBlank)],
        ['透明度 / Transparency',transLabel(d.trans)+' · '+d.trans.split('–').map(t=>transWords[t]).join(' → ')],
        ['现象及其他外观特征 / Phenomena and distinctive visual characteristics',pairText(d.phenomena)],
        ['RI 标准值 / RI Norm',d.norm==='Any'?'任意 / Any':d.norm||sourceBlank],
@@ -282,10 +294,10 @@
        ['原表备注 / Source comments',pairText(d.comments)],
      ];
      if(x.riOverLimit)properties.splice(7,0,['折射仪量程 / Refractometer limit','原表标记超量程 / Source marks RI over limit']);
-     const detail=open?`<tr id="detail-${x.n}"><td colspan="10"><div class="gem-details"><h3>${escapeHtml(x.en)} <small>${escapeHtml(x.zh)}</small></h3><dl>${properties.map(([k,v])=>`<div><dt>${k}</dt><dd>${escapeHtml(v)}</dd></div>`).join('')}</dl></div></td></tr>`:'';
+     const detail=open?`<tr id="detail-${x.n}"><td colspan="10"><div class="gem-details" id="detail-content-${x.n}"><h3>${escapeHtml(x.en)} <small>${escapeHtml(x.zh)}</small></h3><dl>${properties.map(([k,v])=>`<div><dt>${k}</dt><dd>${escapeHtml(v)}</dd></div>`).join('')}</dl></div></td></tr>`:'';
      return `<tr>${control}<td><span class="name-en">${escapeHtml(x.en)}</span><span class="name-zh">${escapeHtml(x.zh)}</span><span class="muted" title="荧光：✓ 可能有，— 无，? 未知 / Fluorescence: ✓ possible, — inert, ? unknown">${escapeHtml(uvSummary(d))}</span></td><td class="colour-cell">${colourDots(x.colors)}</td><td class="trans-cell"><strong>${transLabel(d.trans)}</strong><span>${escapeHtml(d.trans.split('–').map(t=>transWords[t].split(' / ')[0]).join('–'))}</span><small lang="en">${escapeHtml(d.trans.split('–').map(t=>transWords[t].split(' / ')[1]).join('–'))}</small></td><td>${riDisplay}</td><td>${sgDisplay}</td><td>${x.optics||'—'}</td><td><button class="small-button detail-action" data-id="${x.n}" aria-expanded="${open}" aria-controls="detail-${x.n}">${open?'收起 / Close':'展开 / Details'}</button></td><td class="match-percent"><span>RI ${matchPercent(nominalIntervals(x,'riIntervals'),ri)}</span><span>SG ${matchPercent(nominalIntervals(x,'sgIntervals'),sg)}</span></td></tr>${detail}`;
    }).join('')}</tbody>`:`<tbody><tr><td class="empty" colspan="10">没有相符候选 / No matching candidates.</td></tr></tbody>`;
-   document.querySelectorAll('.detail-action').forEach(button=>button.addEventListener('click',()=>{const id=Number(button.dataset.id);expandedIds.has(id)?expandedIds.delete(id):expandedIds.add(id);render();}));
+   document.querySelectorAll('.detail-action').forEach(button=>button.addEventListener('click',()=>{const id=Number(button.dataset.id),opening=!expandedIds.has(id);opening?expandedIds.add(id):expandedIds.delete(id);render();if(opening){$('results').parentElement.scrollLeft=0;$('detail-content-'+id).scrollIntoView({block:'nearest',inline:'start'});}}));
    document.querySelectorAll('.candidate-action').forEach(button=>button.addEventListener('click',()=>{const id=Number(button.dataset.id);if(hiddenIds.has(id))hiddenIds.delete(id);else hiddenIds.add(id);render();}));
   }
   function updateSgCalculator(){const air=Number($('airWeight').value.trim().replace(',','.')),water=Number($('waterWeight').value.trim().replace(',','.')),valid=Number.isFinite(air)&&Number.isFinite(water)&&air>water&&water>0,result=valid?air/(air-water):null;$('sgCalcResult').textContent=result==null?'SG —':`SG ${result.toFixed(3)}`;$('useSg').disabled=result==null;$('useSg').dataset.result=result==null?'':result.toFixed(3);}

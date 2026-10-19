@@ -4,8 +4,10 @@
  const textFields=['colorNote','phenomena','spectra','uv','fracture','comments'],trans=['TP','STP','TL','STL','OP'];
  const legacyTrans={TP:'Tp',STP:'S-Tp',TL:'Tl',STL:'S-Tl',OP:'O'},clone=x=>JSON.parse(JSON.stringify(x));
  const pair=x=>Array.isArray(x)?{en:x[0]||'',zh:x[1]||''}:{en:x||'',zh:x||''};
- // Read legacy prose without rewriting it; absence is not an inert reaction.
+ // Saved selections are authoritative. Prose parsing is only for untouched legacy rows.
+ const selectedUvBands=p=>({LW:p.uvBands?.LW===true,SW:p.uvBands?.SW===true});
  function uvBands(p){
+  if(Object.hasOwn(p,'uvBands'))return selectedUvBands(p);
   const en=(Array.isArray(p.uv)?p.uv[0]:p.uv?.en)||'',out={LW:null,SW:null};
   if(/^Any$/i.test(en.trim()))Object.assign(out,{LW:true,SW:true});
   const clauses=[...en.matchAll(/\b(LW\s*&\s*SW|SW\s*&\s*LW|LW|SW)\s*:\s*([\s\S]*?)(?=\b(?:LW|SW)\b\s*(?:&|:)|$)/gi)];
@@ -62,9 +64,9 @@
  function applyOverrides(base,bundle){return base.map(original=>{const r=bundle?.records?.[original.sourceChart+'-'+original.sourceRow];if(!r)return original;const checked=validate(r);if(!checked.valid)throw Error('Invalid correction '+r.id+': '+checked.errors.map(x=>x.field).join(', '));const x=clone(original),d=x.chart,p=r.properties;x.en=r.names.en;x.zh=r.names.zh;
   Object.assign(d,{norm:norm(r.ri),plus:Number(r.ri.range.plus||0),minus:Number(r.ri.range.minus||0),spot:r.ri.spots.join('；'),sgNorm:norm(r.sg),sgPlus:Number(r.sg.range.plus||0),sgMinus:Number(r.sg.range.minus||0),riSourceRange:rangeText(r.ri.range),sgSourceRange:rangeText(r.sg.range),reviewedRange:true,optic:p.optic.includes('Any')?'Any':p.optic.filter(o=>o!=='ADR').join(' '),axis:p.axis,system:p.system,pleo:p.pleo.join(' '),hard:p.hardness,trans:p.transparency.map(t=>legacyTrans[t]).join('–')});
   for(const key of textFields)d[key==='colorNote'?'colourNote':key]=key==='colorNote'?[p[key].en,p[key].zh].filter(Boolean).join(' / '):[p[key].en,p[key].zh];
-  if(p.uvBands)d.uvBands=clone(p.uvBands);
+  d.uvBands=selectedUvBands(p);
   for(const [key,category] of [['common','common'],['uncommon','uncommon'],['modifier','modifying']])d[key]=Object.keys(colors).filter(c=>r.colors[c].categories.includes(category)).map(c=>colors[c][0]).join(' ');
   x.colors=[...new Set([d.common,d.uncommon,d.modifier].join(' ').split(' ').filter(Boolean))].join(' ');x.riIntervals=intervals(r.ri);x.sgIntervals=intervals(r.sg);x.riUnknown=r.ri.kind==='unknown'&&!r.ri.spots.length;x.sgUnknown=r.sg.kind==='unknown';x.riOverLimit=r.ri.overLimit;x.optics=p.optic.includes('Any')?'SR DR ADR AGG':p.optic.join(' ');x.optic=d.optic;x.system=d.system;
   x.ril=x.riIntervals?Math.min(...x.riIntervals.map(v=>v[0])):null;x.rih=x.riIntervals?Math.max(...x.riIntervals.map(v=>v[1])):null;x.sgl=x.sgIntervals?.[0][0]??null;x.sgh=x.sgIntervals?.[0][1]??null;return x;});}
- return {colors,trans,textFields,clone,fromBaseRow,validate,intervals,rangeText,applyOverrides,uvBands,uvMatches};
+ return {colors,trans,textFields,clone,fromBaseRow,validate,intervals,rangeText,applyOverrides,uvBands,uvMatches,selectedUvBands};
 });

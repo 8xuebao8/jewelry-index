@@ -19,6 +19,13 @@ Upload the contents of this folder to the repository root, with index.html at th
 - Default equal-weight relative-distance ranking against nominal RI/SG values, using interval midpoints or the nearest separate reading.
 - Separate RI/SG matching percentages, not identification probabilities; source ranges and measurement tolerances still control inclusion.
 
+## 2026-10-19 修复 / Repairs
+
+- 荧光以手动勾选为准：已勾选为有，未勾选为无；不再用旧原文补成“未知”或“有”。 / Saved LW/SW selections are authoritative: checked = yes, unchecked = no; legacy prose does not override them.
+- RI/SG 仅接受正有限小数（支持小数逗号）；无效输入会提示并跳过该条件，其他有效条件继续生效。 / RI/SG require finite positive decimals; invalid inputs are visibly flagged and skipped without disabling other valid filters.
+- 手机横向滚动后展开详情，会将详情移入视野；已保存的空颜色备注不再被旧染色备注覆盖。 / Expanded mobile details enter view; saved blank colour notes stay blank.
+- GIA 官方中文名未查证的 Chlorastrolite、Saussurite、Prosopite 仍保留“中文名待核”。 / Those three names remain pending official GIA Chinese verification.
+
 ## 数据与发布说明 / Data and publishing notes
 
 review-overrides.js 包含已应用的手动校对数据，必须一起上传。本文件夹是独立快照，今后本地校对修改不会自动更新到 GitHub。
