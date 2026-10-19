@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%23006d5b' d='M32 4 56 28 32 60 8 28z'/%3E%3Cpath fill='%23fff' d='m32 14 12 14-12 22-12-22z'/%3E%3C/svg%3E">
-  <title>宝石物性检索 · Chart A</title>
+  <title>宝石物性检索 · Chart A + B</title>
   <style>
     :root{--ink:#1d2927;--muted:#63716e;--line:#dce4df;--paper:#f7f8f4;--accent:#006d5b;--warm:#dd9b33;--card:#fff}
     *{box-sizing:border-box} body{margin:0;background:var(--paper);font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC",sans-serif;color:var(--ink)}
@@ -73,18 +73,58 @@
       .gem-details dd{font-size:1rem;line-height:1.7;margin:6px 0 0;overflow-wrap:anywhere;word-break:normal}
       .foot{font-size:.8125rem;line-height:1.7;padding:0 16px 30px}
     }
+    .chart-picker{grid-column:1/-1;border:0;padding:0;margin:0 0 2px;min-width:0}
+    .chart-picker legend{font-size:13px;color:var(--muted);margin-bottom:8px}
+    .chart-segments{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));position:relative;padding:4px;background:#eaf1ed;border:1px solid #c8d4ce;border-radius:12px;max-width:480px;isolation:isolate}
+    .chart-segments::before{content:"";position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px)/3);border-radius:8px;background:var(--accent);transform:translateX(100%);transition:transform .2s ease;z-index:-1}
+    .chart-segments:has(input[value="A"]:checked)::before{transform:translateX(0)}
+    .chart-segments:has(input[value="B"]:checked)::before{transform:translateX(200%)}
+    .chart-segments label{position:relative;cursor:pointer;min-width:0}
+    .chart-segments input{position:absolute;opacity:0;width:1px;height:1px;min-height:0}
+    .chart-segments span{display:flex;align-items:center;justify-content:center;min-height:44px;padding:8px;font-size:15px;color:#35564e;border-radius:8px}
+    .chart-segments input:checked+span{color:white;background:var(--accent);font-weight:650}
+    .chart-segments input:focus-visible+span{outline:3px solid #dd9b33;outline-offset:2px}
+    .source-number{white-space:nowrap;font-variant-numeric:tabular-nums;font-size:12px;color:#4e625b}
+    @media(prefers-reduced-motion:reduce){.chart-segments::before{transition:none}}
+    @media(max-width:720px){.chart-segments{max-width:none}.chart-picker legend{font-size:.875rem}.source-number{font-size:.8125rem}}
+    .sort-toggle{display:flex;align-items:center;gap:9px;min-height:44px;cursor:pointer;font-size:13px;position:relative}
+    .sort-toggle input{position:absolute;opacity:0;width:1px;height:1px;min-height:0;padding:0}
+    .sort-track{width:40px;height:24px;flex:none;border-radius:20px;background:#89958f;position:relative}
+    .sort-track::after{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;border-radius:50%;background:#fff}
+    .sort-toggle input:checked+.sort-track{background:var(--accent)}
+    .sort-toggle input:checked+.sort-track::after{transform:translateX(16px)}
+    .sort-toggle input:focus-visible+.sort-track{outline:3px solid #dd9b33;outline-offset:3px}
+    .sort-toggle small{display:block;font-size:12px;color:var(--muted)}
+    .sort-note{flex-basis:100%;margin:0;font-size:12px;line-height:1.5;color:var(--muted)}
+    .match-percent{white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:650}
+    .match-percent span{display:block}
   </style>
 </head>
 <body>
-  <header><div class="eyebrow">个人课堂参考 · PERSONAL CLASSROOM REFERENCE · 64 MATERIALS</div><h1 class="title">宝石物性检索 <span lang="en">/ Gem Property Finder</span></h1><p class="sub">根据测得的折射率、比重与光性筛选候选材料。 / Filter possible gem materials by RI, SG, colour and optical character.</p></header>
+  <header><div class="eyebrow">个人课堂参考 · PERSONAL CLASSROOM REFERENCE · CHART A + B · 103 项 / MATERIALS</div><h1 class="title">宝石物性检索 <span lang="en">/ Gem Property Finder</span></h1><p class="sub">根据测得的折射率、比重与光性筛选候选材料。 / Filter possible gem materials by RI, SG, colour and optical character.</p></header>
   <main>
-    <div class="notice">本工具按你提供的 GIA Gem Property Chart A（1992）照片建立，供个人学习与课堂使用。筛选结果是候选范围，不能替代完整鉴定流程；请结合显微镜、光谱、UV、内含物等复核。 / Built from your GIA Gem Property Chart A (1992) photos for personal classroom reference. Results are candidates only and require full gemological confirmation.</div>
+    <div class="notice">本工具按你提供的 GIA Gem Property Chart A、B（1992）照片建立，供个人学习与课堂使用。筛选结果是候选范围，不能替代完整鉴定流程；请结合显微镜、光谱、UV、内含物等复核。 / Built from your GIA Gem Property Chart A and B (1992) photos for personal classroom reference. Results are candidates only and require full gemological confirmation.</div>
     <section class="panel" aria-label="筛选条件 / Filters">
       <div class="fields">
+        <fieldset class="chart-picker"><legend>数据范围 / Chart scope</legend><div class="chart-segments">
+          <label><input type="radio" name="chart" value="A"><span>Chart A</span></label>
+          <label><input type="radio" name="chart" value="all" checked><span>全部 / All</span></label>
+          <label><input type="radio" name="chart" value="B"><span>Chart B</span></label>
+        </div></fieldset>
         <div class="field search"><label for="q">名称或别名（支持模糊搜索） / Name or alias (fuzzy search)</label><input id="q" type="search" placeholder="例如：翡翠、emerald、garnet"></div>
         <fieldset class="multi"><legend>颜色（可多选） / Colour (multi-select)</legend><div class="choices" id="colorChoices">
-          <label class="choice" style="--swatch:linear-gradient(135deg,#fff 40%,#d7e9ee 55%,#fff 70%)"><input name="color" value="无色" type="checkbox"><span><b>无色</b><i class="bi-separator"> / </i><small lang="en">Colourless</small></span></label><label class="choice" style="--swatch:#c83246"><input name="color" value="红" type="checkbox"><span><b>红</b><i class="bi-separator"> / </i><small lang="en">Red</small></span></label><label class="choice" style="--swatch:#98358c"><input name="color" value="紫" type="checkbox"><span><b>紫</b><i class="bi-separator"> / </i><small lang="en">Purple (P)</small></span></label><label class="choice" style="--swatch:#ef8e2e"><input name="color" value="橙" type="checkbox"><span><b>橙</b><i class="bi-separator"> / </i><small lang="en">Orange</small></span></label><label class="choice" style="--swatch:#ebcf32"><input name="color" value="黄" type="checkbox"><span><b>黄</b><i class="bi-separator"> / </i><small lang="en">Yellow</small></span></label><label class="choice" style="--swatch:#349166"><input name="color" value="绿" type="checkbox"><span><b>绿</b><i class="bi-separator"> / </i><small lang="en">Green</small></span></label><label class="choice" style="--swatch:#3988cd"><input name="color" value="蓝" type="checkbox"><span><b>蓝</b><i class="bi-separator"> / </i><small lang="en">Blue</small></span></label><label class="choice" style="--swatch:#6560b6"><input name="color" value="蓝紫" type="checkbox"><span><b>蓝紫</b><i class="bi-separator"> / </i><small lang="en">Violet (V)</small></span></label><label class="choice" style="--swatch:#8b5940"><input name="color" value="褐" type="checkbox"><span><b>褐</b><i class="bi-separator"> / </i><small lang="en">Brown</small></span></label><label class="choice" style="--swatch:#2c3035"><input name="color" value="黑" type="checkbox"><span><b>黑</b><i class="bi-separator"> / </i><small lang="en">Black</small></span></label><label class="choice" style="--swatch:#fff"><input name="color" value="白" type="checkbox"><span><b>白</b><i class="bi-separator"> / </i><small lang="en">White</small></span></label>
-        <label class="choice" style="--swatch:#a7abad"><input name="color" value="灰" type="checkbox"><span><b>灰</b><i class="bi-separator"> / </i><small lang="en">Gray</small></span></label>
+          <label class="choice" style="--swatch:linear-gradient(135deg,#fff 40%,#d7e9ee 55%,#fff 70%)"><input name="color" value="无色" type="checkbox"><span><b>无色</b><i class="bi-separator"> / </i><small lang="en">Colourless</small></span></label>
+          <label class="choice" style="--swatch:#98358c"><input name="color" value="紫" type="checkbox"><span><b>紫</b><i class="bi-separator"> / </i><small lang="en">Purple (P)</small></span></label>
+          <label class="choice" style="--swatch:#c83246"><input name="color" value="红" type="checkbox"><span><b>红</b><i class="bi-separator"> / </i><small lang="en">Red</small></span></label>
+          <label class="choice" style="--swatch:#ef8e2e"><input name="color" value="橙" type="checkbox"><span><b>橙</b><i class="bi-separator"> / </i><small lang="en">Orange</small></span></label>
+          <label class="choice" style="--swatch:#ebcf32"><input name="color" value="黄" type="checkbox"><span><b>黄</b><i class="bi-separator"> / </i><small lang="en">Yellow</small></span></label>
+          <label class="choice" style="--swatch:#349166"><input name="color" value="绿" type="checkbox"><span><b>绿</b><i class="bi-separator"> / </i><small lang="en">Green</small></span></label>
+          <label class="choice" style="--swatch:#3988cd"><input name="color" value="蓝" type="checkbox"><span><b>蓝</b><i class="bi-separator"> / </i><small lang="en">Blue</small></span></label>
+          <label class="choice" style="--swatch:#6560b6"><input name="color" value="蓝紫" type="checkbox"><span><b>蓝紫</b><i class="bi-separator"> / </i><small lang="en">Violet (V)</small></span></label>
+          <label class="choice" style="--swatch:#8b5940"><input name="color" value="褐" type="checkbox"><span><b>褐</b><i class="bi-separator"> / </i><small lang="en">Brown</small></span></label>
+          <label class="choice" style="--swatch:#fff"><input name="color" value="白" type="checkbox"><span><b>白</b><i class="bi-separator"> / </i><small lang="en">White</small></span></label>
+          <label class="choice" style="--swatch:#a7abad"><input name="color" value="灰" type="checkbox"><span><b>灰</b><i class="bi-separator"> / </i><small lang="en">Gray</small></span></label>
+          <label class="choice" style="--swatch:#2c3035"><input name="color" value="黑" type="checkbox"><span><b>黑</b><i class="bi-separator"> / </i><small lang="en">Black</small></span></label>
         </div></fieldset>
         <fieldset class="multi"><legend>光性（可多选） / Optical character (multi-select)</legend><div class="choices" id="opticChoices">
           <label class="choice"><input name="optic" value="SR" type="checkbox"><span><b>SR 单折射</b><i class="bi-separator"> / </i><small lang="en">Singly refractive</small></span></label><label class="choice"><input name="optic" value="DR" type="checkbox"><span><b>DR 双折射</b><i class="bi-separator"> / </i><small lang="en">Doubly refractive</small></span></label><label class="choice"><input name="optic" value="ADR" type="checkbox"><span><b>ADR 异常双折射</b><i class="bi-separator"> / </i><small lang="en">Anomalous DR</small></span></label><label class="choice"><input name="optic" value="AGG" type="checkbox"><span><b>AGG 集合体</b><i class="bi-separator"> / </i><small lang="en">Aggregate</small></span></label>
@@ -96,6 +136,10 @@
         <label class="choice"><input name="trans" value="S-Tl" type="checkbox"><span><b>STL 微透明</b><i class="bi-separator"> / </i><small lang="en">Semitranslucent</small></span></label>
         <label class="choice"><input name="trans" value="O" type="checkbox"><span><b>OP 不透明</b><i class="bi-separator"> / </i><small lang="en">Opaque</small></span></label>
       </div></fieldset>
+        <fieldset class="multi"><legend>荧光（可多选） / Fluorescence (multi-select)</legend><div class="choices" id="uvChoices">
+          <label class="choice"><input name="uv" value="LW" type="checkbox"><span title="长波 / Long-wave">LW</span></label>
+          <label class="choice"><input name="uv" value="SW" type="checkbox"><span title="短波 / Short-wave">SW</span></label>
+        </div><p class="hint">LW 长波 / Long-wave · SW 短波 / Short-wave。选择可能有荧光的波段；双选匹配任一波段，未知保留。/ Select possible fluorescence; either band matches, unknowns retained.</p></fieldset>
         <div class="field"><label for="ri">测得 RI / Measured RI</label><input id="ri" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" placeholder="例如 / e.g. 1.620"></div>
         <div class="field"><label class="range-label" for="riTol">RI 误差 / RI tolerance ± <output id="riTolValue">0.000</output></label><input id="riTol" type="range" min="0" max="0.300" step="0.001" value="0"><p class="hint">拖动以扩大测量区间 / Drag to expand range</p></div>
         <div class="field"><label for="sg">测得 SG / Measured SG</label><input id="sg" type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" placeholder="例如 / e.g. 3.34"></div>
@@ -108,35 +152,25 @@
         </div></fieldset>
       </div>
     </section>
-    <div class="result-tools"><p class="summary" id="summary"></p><button class="small-button" id="restoreAll" type="button" hidden>恢复全部 / Restore all</button></div><div class="table-wrap"><table class="results-table" id="results"></table></div>
+    <div class="result-tools"><p class="summary" id="summary"></p><label class="sort-toggle"><input id="sortByMatch" type="checkbox" role="switch" checked aria-describedby="sortNote"><span class="sort-track" aria-hidden="true"></span><span>按置信度排序<small lang="en">Sort by match</small></span></label><button class="small-button" id="restoreAll" type="button" hidden>恢复全部 / Restore all</button><p class="sort-note" id="sortNote">按 RI、SG 与标称值的接近程度排序；区间取中点，独立读数取最近值。百分比不是鉴定正确率。 / Ranked by relative RI/SG distance to nominal values: interval midpoints or nearest separate readings. Percentages are not identification probabilities.</p></div><div class="table-wrap"><table class="results-table" id="results"></table></div>
   </main>
   <footer class="foot">
-    <p>来源 / Source：GIA Gem Property Chart A，© 1992 The Gemological Institute of America，用户提供的两张照片。64 项印刷数据已逐项转录并配中文译文；这是历史课堂资料，并非现行鉴定标准或 GIA 官方软件。 / 64 printed entries transcribed from the supplied photos with Chinese translations. Historical classroom reference, not current identification standards or official GIA software.</p>
-    <p>筛选 / Filtering：RI、SG 先计入原表 Range，再叠加独立的测量误差 ±。颜色包括常见色、少见色及修饰色；保留原表 P（Purple，紫）与 V（Violet，蓝紫）的区分。ADR 取自备注；AGG 同时参考光性栏及备注。拼合石原表为 Any，不因数值或光性被排除。 / Source variation is applied before the independent measurement tolerance. All chart colour categories are searchable. ADR and additional AGG reactions come from comments. Assembled stones remain possible for any readings.</p>
+    <p>来源 / Source：GIA Gem Property Chart A、B，© 1992 The Gemological Institute of America。Chart A 64 项，Chart B 保留 39 项（涂黑名称的 24 项已排除）。英文保留原表转录，中文为辅助译文；Chlorastrolite、Saussurite、Prosopite 的中文名待核。编号按各表原始行序保留，不因筛选重新编号。 / Chart A: 64 entries; Chart B: 39 retained, 24 blacked-out names excluded. English is transcribed source text; Chinese is editorial translation. Chinese names for Chlorastrolite, Saussurite and Prosopite remain pending. Numbers retain source-row order. Historical classroom reference, not current identification standards or official GIA software.</p>
+    <p>点测及缺失值 / Spot readings and missing values：只有点测 RI 的材料按各独立读数及原表 Range 匹配，不连成区间。原表未提供 RI 数值的材料不因 RI 被排除，并明确标为未知，不作“任意值”解释。 / Spot-only RI entries use separate readings plus source Range. Materials without numeric source RI remain candidates, explicitly labelled unknown rather than Any.</p>
+    <p>筛选 / Filtering：RI、SG 先计入原表 Range，再叠加独立的测量误差 ±。颜色包括常见色、少见色及修饰色；保留原表 P（Purple，紫）与 V（Violet，蓝紫）的区分。选择 ADR 时按 SR 检索；AGG 同时参考光性栏及备注。拼合石原表为 Any，不因数值或光性被排除。 / Source variation is applied before the independent measurement tolerance. All chart colour categories are searchable. Selecting ADR searches SR materials. Additional AGG reactions come from comments. Assembled stones remain possible for any readings.</p>
     <p>光谱星号 / Spectrum key：*** 几乎总能发现；** 较少发现；两者出现时须结合其他测试。* 有时发现，不一定具诊断性。空白表示未发现或不具诊断性。 / *** Almost always found; ** less often found; either supports identification when combined with other tests. * Sometimes found, not always diagnostic. Blank: none found or not diagnostic.</p>
     <p>安全说明 / Safety：备注中的热针、酸液、溶剂、重液及牙齿接触是原表历史描述，不是操作建议；可能损伤宝石或危害健康，请勿自行尝试。单一候选匹配不等于鉴定结论。 / Historical hot-point, acid, solvent, heavy-liquid and tooth-contact descriptions are not instructions; they may damage gems or harm health. A filter match is not an identification.</p>
   </footer>
   <script src="gem-data.js"></script>
+  <script src="chart-b-source.js"></script>
+  <script src="chart-b-data.js"></script>
+  <script src="base-rows.js"></script>
+  <script src="review-model.js"></script>
+  <script src="review-overrides.js"></script>
   <script>
-  // Names and search terms; all properties come from gem-data.js.
-  const rows = [[1,"Hematite","赤铁矿","hematite"],[2,"Synthetic rutile","合成金红石","syn rutile"],[3,"Diamond","钻石","diamond"],[4,"Strontium titanate","钛酸锶","strontium titanate"],[5,"Cubic zirconia","立方氧化锆","CZ cubic zirconia"],[6,"GGG","钆镓榴石","gadolinium gallium garnet"],[7,"Zircon","锆石","zircon"],[8,"Andradite","钙铁榴石","andradite demantoid"],[9,"YAG","钇铝榴石","yttrium aluminum garnet"],[10,"Spessartite","锰铝榴石","spessartine garnet"],[11,"Almandite","铁铝榴石","almandine garnet"],[12,"Corundum","刚玉","ruby sapphire"],[13,"Synthetic corundum (flame fusion)","合成刚玉（焰熔）","synthetic sapphire ruby"],[14,"Synthetic corundum (flux)","合成刚玉（助熔剂）","flux synthetic corundum"],[15,"Rhodolite","紫牙乌","rhodolite garnet"],[16,"Chrysoberyl","金绿宝石","alexandrite chrysoberyl"],[17,"Pyrope","镁铝榴石","pyrope garnet"],[18,"Grossularite","钙铝榴石","grossular garnet"],[19,"Hydrogrossular","水钙铝榴石","hydrogrossular garnet"],[20,"Rhodonite","蔷薇辉石","rhodonite"],[21,"Synthetic spinel","合成尖晶石","syn spinel"],[22,"Spinel","尖晶石","spinel"],[23,"Idocrase","符山石","vesuvianite idocrase"],[24,"Zoisite","黝帘石","tanzanite zoisite"],[25,"Diopside","透辉石","diopside"],[26,"Spodumene","锂辉石","kunzite spodumene"],[27,"Jadeite","硬玉","jadeite 翡翠 jade"],[28,"Jet","煤精","jet"],[29,"Malachite","孔雀石","malachite"],[30,"Peridot","橄榄石","olivine peridot"],[31,"Andalusite","红柱石","andalusite"],[32,"Tourmaline","电气石","tourmaline"],[33,"Topaz","黄玉","topaz"],[34,"Turquoise","绿松石","turquoise"],[35,"Nephrite","软玉","nephrite 和田玉 jade"],[36,"Rhodochrosite","菱锰矿","rhodochrosite"],[37,"Beryl","绿柱石","beryl emerald aquamarine"],[38,"Synthetic emerald (hydrothermal)","合成祖母绿（水热法）","hydrothermal synthetic emerald"],[39,"Synthetic emerald (flux)","合成祖母绿（助熔剂法）","flux synthetic emerald"],[40,"Serpentine","蛇纹石","serpentine"],[41,"Coral (conchiolin)","珊瑚（角质）","coral conchiolin"],[42,"Labradorite","拉长石","labradorite feldspar"],[43,"Tortoise shell","玳瑁","tortoise shell"],[44,"Quartz","石英","quartz amethyst citrine"],[45,"Iolite","堇青石","cordierite iolite"],[46,"Ivory","象牙","ivory"],[47,"Amber","琥珀","amber"],[48,"Oligoclase","奥长石","oligoclase feldspar"],[49,"Chalcedony","玉髓","chalcedony"],[50,"Pearl","珍珠","pearl natural cultured"],[51,"Shell","贝壳","shell mother of pearl"],[52,"Microcline","微斜长石","microcline feldspar amazonite"],[53,"Orthoclase","正长石","orthoclase feldspar"],[54,"Lapis lazuli","青金石","lapis lazuli"],[55,"Obsidian","黑曜石","obsidian natural glass"],[56,"Moldavite","摩尔达维石","moldavite natural glass"],[57,"Calcite","方解石","calcite"],[58,"Coral (calcareous)","珊瑚（钙质）","coral calcareous"],[59,"Sodalite","方钠石","sodalite"],[60,"Opal","蛋白石","opal"],[61,"Glass","玻璃","man made glass"],[62,"Plastic","塑料","plastic"],[63,"Fluorite","萤石","fluorite"],[64,"Assembled stone","拼合石","doublet triplet assembled stone"]]
-    .map(([n,en,zh,aliases])=>({n,en:en.replace(/^Synthetic\s+/,'SYN. '),zh,aliases:en.startsWith('Synthetic ')?en+' '+aliases:aliases}));
+  const rows=ReviewModel.applyOverrides(createBaseRows(),reviewOverrides);
   const colorEnglish={无色:'Colourless',红:'Red',蓝紫:'Violet',橙:'Orange',黄:'Yellow',绿:'Green',蓝:'Blue',紫:'Purple',褐:'Brown',黑:'Black',白:'White',灰:'Gray'};
   const systemEnglish={六方晶系:'Hexagonal',四方晶系:'Tetragonal',立方晶系:'Cubic',斜方晶系:'Orthorhombic',单斜晶系:'Monoclinic',三斜晶系:'Triclinic',无定形:'Amorphous',有机集合体:'Organic aggregate',隐晶质集合体:'Cryptocrystalline aggregate','岩石／集合体':'Rock / aggregate',多材料:'Composite material'};
-
-  rows.forEach(x=>{
-    const d=chartNumeric.find(d=>d.n===x.n);
-    if(!d||!chartText.has(x.n)) throw new Error('Missing chart record '+x.n);
-    x.chart={...d,...chartText.get(x.n)};
-    x.riIntervals=chartIntervals(d.norm,d.plus,d.minus);
-    x.sgIntervals=chartIntervals(d.sgNorm,d.sgPlus,d.sgMinus);
-    x.ril=x.riIntervals?Math.min(...x.riIntervals.map(i=>i[0])):null;
-    x.rih=x.riIntervals?Math.max(...x.riIntervals.map(i=>i[1])):null;
-    x.sgl=x.sgIntervals?.[0][0]??null; x.sgh=x.sgIntervals?.[0][1]??null;
-    x.system=d.system; x.optic=d.optic;
-    x.optics=d.optic==='Any'?'SR DR ADR AGG':d.optic+(chartADR.has(x.n)?' ADR':'')+([61,62].includes(x.n)?' AGG':'');
-    x.colors=[...new Set((d.common+' '+d.uncommon+' '+d.modifier).trim().split(/\s+/))].join(' ');
-  });
   const escapeHtml=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const pairText=p=>p[0]===p[1]?p[0]:p[0]+' / '+p[1];
   const sourceBlank=pairText(chartVocabulary.blank);
@@ -149,61 +183,113 @@
     return selected.some(t=>{const i=transparencyOrder.indexOf(t);return i>=bounds[0]&&i<=bounds[bounds.length-1]});
   }
   const swatches={无色:'linear-gradient(135deg,#fff 40%,#d7e9ee 55%,#fff 70%)',红:'#c83246',紫:'#98358c',橙:'#ef8e2e',黄:'#ebcf32',绿:'#349166',蓝:'#3988cd',蓝紫:'#6560b6',褐:'#8b5940',黑:'#2c3035',白:'#fff',灰:'#a7abad'};
-  const colourDots=value=>'<div class="colour-dots">'+value.split(' ').map(c=>'<button type="button" class="colour-dot" style="--swatch:'+swatches[c]+'" aria-label="'+c+' / '+colorEnglish[c]+'"><i aria-hidden="true"></i><span aria-hidden="true">'+c+' / '+colorEnglish[c]+'</span></button>').join('')+'</div>';
-  const axisWords={'U+':'一轴晶正光性 / Uniaxial positive','U−':'一轴晶负光性 / Uniaxial negative','U±':'一轴晶正或负光性 / Uniaxial positive or negative','B+':'二轴晶正光性 / Biaxial positive','B−':'二轴晶负光性 / Biaxial negative'};
+  const colourDots=value=>'<div class="colour-dots">'+['无色','紫','红','橙','黄','绿','蓝','蓝紫','褐','白','灰','黑'].filter(c=>value.split(' ').includes(c)).map(c=>'<button type="button" class="colour-dot" style="--swatch:'+swatches[c]+'" aria-label="'+c+' / '+colorEnglish[c]+'"><i aria-hidden="true"></i><span aria-hidden="true">'+c+' / '+colorEnglish[c]+'</span></button>').join('')+'</div>';
+  const axisWords={'U+':'一轴晶正光性 / Uniaxial positive','U−':'一轴晶负光性 / Uniaxial negative','U±':'一轴晶正或负光性 / Uniaxial positive or negative','B+':'二轴晶正光性 / Biaxial positive','B−':'二轴晶负光性 / Biaxial negative','B±':'二轴晶正或负光性 / Biaxial positive or negative'};
   const pleoWords={'2':'二色性 / Dichroic','3':'三色性 / Trichroic',S:'强 / Strong',M:'中等 / Moderate',W:'弱 / Weak'};
   const variation=(p,m,d=3)=>p===0&&m===0?sourceBlank:p===m?'± '+p.toFixed(d):'+'+p.toFixed(d)+' / −'+m.toFixed(d);
   const intervalText=intervals=>intervals===null?'任意 / Any':intervals.map(([a,b])=>fmt(a,b)).join('；或 / or ');
 
   const $=id=>document.getElementById(id), fmt=(a,b,d=3)=>a==null?'—':a===b?a.toFixed(d):`${a.toFixed(d)}–${b.toFixed(d)}`;
   const hiddenIds=new Set([64]), expandedIds=new Set();
+  // Ranking uses nominal values, independently of Range/tolerance filtering.
+  function nominalIntervals(row,field){
+    const d=row.chart,ri=field==='riIntervals';
+    const norm=(ri?d.norm:d.sgNorm)||'';
+    if(norm==='Any')return null;
+    const source=norm||(ri?(d.spot||'').replace(/[；;]/g,','):'');
+    if(!source.trim())return null;
+    const values=chartIntervals(source,0,0).filter(pair=>pair.every(v=>Number.isFinite(v)&&v>0));
+    return values.length?values:null;
+  }
+  function numericMatchDistance(intervals,value){
+    const measured=Number(value);
+    if(value===''||!Number.isFinite(measured)||measured<=0||!intervals?.length)return null;
+    const distance=Math.min(...intervals.map(([low,high])=>Math.abs((low+high)/2-measured)));
+    return (distance<1e-9?0:distance)/measured;
+  }
+  function matchPercent(intervals,value){
+    const distance=numericMatchDistance(intervals,value);
+    if(distance===null)return '—';
+    if(distance===0)return '100%';
+    return Math.min(99.99,100/(1+distance)).toFixed(2)+'%';
+  }
+  function sortByNumericMatch(list,ri,sg){
+    const inputs=[['riIntervals',ri],['sgIntervals',sg]].filter(([,v])=>v!==''&&Number.isFinite(Number(v))&&Number(v)>0);
+    if(!inputs.length)return list;
+    const scored=list.map((row,index)=>{
+      let missing=0,total=0;
+      for(const [field,value] of inputs){
+        const distance=numericMatchDistance(nominalIntervals(row,field),value);
+        if(distance===null){missing++;continue;}
+        total+=distance;
+      }
+      return {row,index,missing,score:total/inputs.length};
+    });
+    scored.sort((a,b)=>{
+      if(a.row.n===64||b.row.n===64)return Number(a.row.n===64)-Number(b.row.n===64);
+      if(a.missing!==b.missing)return a.missing-b.missing;
+      const delta=a.score-b.score;
+      return Math.abs(delta)>1e-12?delta:a.index-b.index;
+    });
+    return scored.map(x=>x.row);
+  }
+  const uvSummary=d=>Object.entries(ReviewModel.uvBands(d)).map(([b,v])=>b+' '+(v===null?'? 未知 / Unknown':v?'✓':'—')).join(' · ');
   function render(){const trans=[...document.querySelectorAll('input[name="trans"]:checked')].map(x=>x.value);$('transSelection').textContent=trans.length?trans.map(transLabel).join(' · '):'不限 / Any';const q=$('q').value.trim().toLowerCase(),colors=[...document.querySelectorAll('input[name="color"]:checked')].map(x=>x.value),optics=[...document.querySelectorAll('input[name="optic"]:checked')].map(x=>x.value),ri=$('ri').value.trim().replace(',','.'),riTol=$('riTol').value,sg=$('sg').value.trim().replace(',','.'),sgTol=$('sgTol').value;
    $('riTolValue').value=Number(riTol).toFixed(3);$('sgTolValue').value=Number(sgTol).toFixed(3);
-   const used=v=>v!==''&&!Number.isNaN(Number(v)), fuzzy=(query,text)=>{if(!query)return true;const target=text.replace(/[\s()\-]/g,'').toLowerCase(),needle=query.replace(/[\s()\-]/g,'');if(target.includes(needle))return true;let i=0;for(const char of target)if(char===needle[i])i++;return i===needle.length},rangeMatches=(measured,tolerance,intervals)=>!used(measured)||intervals===null||intervals.some(([low,high])=>low<=Number(measured)+Number(tolerance)+1e-9&&high>=Number(measured)-Number(tolerance)-1e-9), matched=rows.filter(x=>{const text=`${x.en} ${x.zh} ${x.aliases}`;return transparencyMatches(x.chart.trans,trans)&&fuzzy(q,text)&&(colors.length===0||colors.some(color=>x.colors.split(' ').includes(color)))&&rangeMatches(ri,riTol,x.riIntervals)&&rangeMatches(sg,sgTol,x.sgIntervals)&&(optics.length===0||optics.some(optic=>x.optics.split(' ').includes(optic)));}), excluded=matched.filter(x=>hiddenIds.has(x.n)),list=matched;
+   const uv=[...document.querySelectorAll('input[name="uv"]:checked')].map(x=>x.value);
+   const scope=[...document.querySelectorAll('input[name="chart"]:checked')][0]?.value||'all';
+   const used=v=>v!==''&&!Number.isNaN(Number(v)), fuzzy=(query,text)=>{if(!query)return true;const target=text.replace(/[\s()\-]/g,'').toLowerCase(),needle=query.replace(/[\s()\-]/g,'');if(target.includes(needle))return true;let i=0;for(const char of target)if(char===needle[i])i++;return i===needle.length},rangeMatches=(measured,tolerance,intervals)=>!used(measured)||intervals===null||intervals.some(([low,high])=>low<=Number(measured)+Number(tolerance)+1e-9&&high>=Number(measured)-Number(tolerance)-1e-9), matched=rows.filter(x=>{const text=`${x.en} ${x.zh} ${x.aliases}`;return (scope==='all'||x.sourceChart===scope)&&ReviewModel.uvMatches(x.chart,uv)&&transparencyMatches(x.chart.trans,trans)&&fuzzy(q,text)&&(colors.length===0||colors.some(color=>x.colors.split(' ').includes(color)))&&rangeMatches(ri,riTol,x.riIntervals)&&rangeMatches(sg,sgTol,x.sgIntervals)&&(optics.length===0||optics.some(optic=>x.optics.split(' ').includes(optic==='ADR'?'SR':optic)));}), excluded=matched.filter(x=>hiddenIds.has(x.n)),sourceList=[...matched.filter(x=>x.n!==64),...matched.filter(x=>x.n===64)];
+   const list=$('sortByMatch').checked?sortByNumericMatch(sourceList,ri,sg):sourceList;
    const errorText=(v,t,d)=>used(v)?` ${Number(v).toFixed(d)}${Number(t)>0?` ± ${Number(t).toFixed(d)}`:''}`:'';
    $('summary').textContent=`找到 ${list.length} 个候选材料 / ${list.length} candidate materials${excluded.length?` · 已隐藏 ${excluded.length} 个 / ${excluded.length} hidden`:''}${q?' · 名称模糊搜索 / fuzzy name search':''}${colors.length?` · 颜色 / colour: ${colors.join('、')}`:''}${optics.length?` · 光性 / optical: ${optics.join('、')}`:''}${errorText(ri,riTol,3)?` · RI${errorText(ri,riTol,3)}`:''}${errorText(sg,sgTol,3)?` · SG${errorText(sg,sgTol,3)}`:''}`;
+   if(uv.length)$('summary').textContent+=' · 荧光 / Fluorescence: '+uv.join(' / ');
    $('restoreAll').hidden=hiddenIds.size===0;
    const bilingualColours=value=>value?value.split(' ').map(c=>`${c} / ${colorEnglish[c]||c}`).join(' · '):'—';
-   $('results').innerHTML=list.length?`<thead><tr><th>折叠 / Fold</th><th>#<br>编号</th><th>宝石材料<br>Gem material</th><th>颜色 / Colour</th><th>透明度<br>Transparency</th><th>RI</th><th>SG</th><th>光性 / Optics</th><th>详情 / Details</th></tr></thead><tbody>${list.map(x=>{
+   $('results').innerHTML=list.length?`<thead><tr><th>折叠 / Fold</th><th>#<br>编号</th><th>宝石材料<br>Gem material</th><th>颜色 / Colour</th><th>透明度<br>Transparency</th><th>RI</th><th>SG</th><th>光性 / Optics</th><th>详情 / Details</th><th>匹配程度 / Match</th></tr></thead><tbody>${list.map(x=>{
      const folded=hiddenIds.has(x.n),open=expandedIds.has(x.n);
      const eyeIcon=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${folded?'<path d="M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 5.2A10 10 0 0 1 12 5c7 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.3 6.3A17 17 0 0 0 2 12s3 7 10 7a10 10 0 0 0 5.7-1.7"/>':'<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>'}</svg>`;
-     const control=`<td><button class="small-button candidate-action" data-id="${x.n}" aria-expanded="${!folded}" aria-label="${folded?'恢复 / Restore':'隐藏 / Hide'} ${x.en}" title="${folded?'恢复 / Restore':'隐藏 / Hide'}">${eyeIcon}</button></td><td>${x.n}</td>`;
-     if(folded)return `<tr class="excluded">${control}<td colspan="7"><span class="muted">已折叠 / Collapsed</span></td></tr>`;
+     const control=`<td><button class="small-button candidate-action" data-id="${x.n}" aria-expanded="${!folded}" aria-label="${folded?'恢复 / Restore':'隐藏 / Hide'} ${escapeHtml(x.en)}" title="${folded?'恢复 / Restore':'隐藏 / Hide'}">${eyeIcon}</button></td><td class="source-number">Chart ${x.sourceChart}<br>${x.sourceRow}</td>`;
+     if(folded)return `<tr class="excluded">${control}<td colspan="8"><span class="muted">已折叠 / Collapsed</span></td></tr>`;
 
      const d=x.chart;
+     const riDisplay=x.riUnknown?'原表未给数值 / No numeric source RI':intervalText(x.riIntervals);
+     const sgDisplay=x.sgUnknown?'未知 SG / Unknown SG':intervalText(x.sgIntervals);
      const properties=[
        ['宝石材料 / Gem material',x.en+' / '+x.zh],
        ['常见颜色（横线） / Common colours (horizontal line)',bilingualColours(d.common)],
        ['少见颜色（竖线） / Uncommon colours (vertical line)',bilingualColours(d.uncommon)],
        ['修饰色（半格） / Modifying colours (half box)',bilingualColours(d.modifier)],
-       ['颜色说明 / Colour note',chartDyed.has(x.n)?'可能染色 / May be dyed':sourceBlank],
+       ['颜色说明 / Colour note',d.colourNote||(chartDyed.has(x.n)?'可能染色 / May be dyed':sourceBlank)],
        ['透明度 / Transparency',transLabel(d.trans)+' · '+d.trans.split('–').map(t=>transWords[t]).join(' → ')],
        ['现象及其他外观特征 / Phenomena and distinctive visual characteristics',pairText(d.phenomena)],
-       ['RI 标准值 / RI Norm',d.norm==='Any'?'任意 / Any':d.norm],
-       ['RI 原表变化范围 / RI Range',x.n===44?'± 0.000（原表明确标注 / explicitly printed）':variation(d.plus,d.minus)],
+       ['RI 标准值 / RI Norm',d.norm==='Any'?'任意 / Any':d.norm||sourceBlank],
+       ['RI 原表变化范围 / RI Range',d.reviewedRange||x.sourceChart==='B'?(d.riSourceRange||sourceBlank):x.n===44?'± 0.000（原表明确标注 / explicitly printed）':variation(d.plus,d.minus)],
        ['RI 点测读数 † / RI spot reading †',d.spot||sourceBlank],
-       ['RI 筛选区间（已计入原表 Range） / RI filter interval (source Range included)',intervalText(x.riIntervals)],
+       ['RI 筛选区间（已计入原表 Range） / RI filter interval (source Range included)',riDisplay],
        ['双折射率 / Birefringence',d.biref||sourceBlank],
        ['光性 / Optical character',d.optic==='Any'?'任意 / Any':d.optic.split(' ').map(o=>({SR:'SR 单折射 / Singly refractive',DR:'DR 双折射 / Doubly refractive',AGG:'AGG 集合体 / Aggregate'}[o])).join('；或 / or ')],
-       ['轴性与光性符号 / Optic axis and sign',axisWords[d.axis]||sourceBlank],
-       ['晶系 / Crystal system',d.system?d.system+' / '+systemEnglish[d.system]+(d.system==='无定形'?'；原表注：结构可能部分结晶 / Source note: structure may be partially crystalline':''):sourceBlank],
+       ['轴性与光性符号 / Optic axis and sign',axisWords[d.axis]||d.axis||sourceBlank],
+       ['晶系 / Crystal system',d.system?d.system+' / '+(systemEnglish[d.system]||d.system)+(d.system==='无定形'?'；原表注：结构可能部分结晶 / Source note: structure may be partially crystalline':''):sourceBlank],
        ['多色性 / Pleochroism',d.pleo?d.pleo.split(' ').map(p=>pleoWords[p]).join(' · '):sourceBlank],
        ['吸收光谱（nm） / Spectra (nm)',pairText(d.spectra)],
-       ['紫外荧光 / Ultraviolet fluorescence',pairText(d.uv)],
+       ['荧光筛选 / Fluorescence selection',uvSummary(d)],
+       ['紫外荧光原文 / Source ultraviolet fluorescence',pairText(d.uv)],
        ['比重标准值 / SG Norm',d.sgNorm==='Any'?'任意 / Any':d.sgNorm],
-       ['比重原表变化范围 / SG source variation',variation(d.sgPlus,d.sgMinus,2)],
-       ['比重筛选区间 / SG filter interval',intervalText(x.sgIntervals)],
+       ['比重原表变化范围 / SG source variation',d.reviewedRange||x.sourceChart==='B'?(d.sgSourceRange||sourceBlank):variation(d.sgPlus,d.sgMinus,2)],
+       ['比重筛选区间 / SG filter interval',sgDisplay],
        ['莫氏硬度 / Mohs hardness',d.hard==='Any'?'任意 / Any':d.hard],
        ['断口、解理与裂理 / Fracture, cleavage and parting',pairText(d.fracture)],
        ['原表备注 / Source comments',pairText(d.comments)],
      ];
-     const detail=open?`<tr id="detail-${x.n}"><td colspan="9"><div class="gem-details"><h3>${x.en} <small>${x.zh}</small></h3><dl>${properties.map(([k,v])=>`<div><dt>${k}</dt><dd>${escapeHtml(v)}</dd></div>`).join('')}</dl></div></td></tr>`:'';
-     return `<tr>${control}<td><span class="name-en">${x.en}</span><span class="name-zh">${x.zh}</span></td><td class="colour-cell">${colourDots(x.colors)}</td><td class="trans-cell"><strong>${transLabel(d.trans)}</strong><span>${escapeHtml(d.trans.split('–').map(t=>transWords[t].split(' / ')[0]).join('–'))}</span><small lang="en">${escapeHtml(d.trans.split('–').map(t=>transWords[t].split(' / ')[1]).join('–'))}</small></td><td>${intervalText(x.riIntervals)}</td><td>${intervalText(x.sgIntervals)}</td><td>${x.optics||'—'}</td><td><button class="small-button detail-action" data-id="${x.n}" aria-expanded="${open}" aria-controls="detail-${x.n}">${open?'收起 / Close':'展开 / Details'}</button></td></tr>${detail}`;
-   }).join('')}</tbody>`:`<tbody><tr><td class="empty" colspan="9">没有相符候选 / No matching candidates.</td></tr></tbody>`;
+     if(x.riOverLimit)properties.splice(7,0,['折射仪量程 / Refractometer limit','原表标记超量程 / Source marks RI over limit']);
+     const detail=open?`<tr id="detail-${x.n}"><td colspan="10"><div class="gem-details"><h3>${escapeHtml(x.en)} <small>${escapeHtml(x.zh)}</small></h3><dl>${properties.map(([k,v])=>`<div><dt>${k}</dt><dd>${escapeHtml(v)}</dd></div>`).join('')}</dl></div></td></tr>`:'';
+     return `<tr>${control}<td><span class="name-en">${escapeHtml(x.en)}</span><span class="name-zh">${escapeHtml(x.zh)}</span><span class="muted" title="荧光：✓ 可能有，— 无，? 未知 / Fluorescence: ✓ possible, — inert, ? unknown">${escapeHtml(uvSummary(d))}</span></td><td class="colour-cell">${colourDots(x.colors)}</td><td class="trans-cell"><strong>${transLabel(d.trans)}</strong><span>${escapeHtml(d.trans.split('–').map(t=>transWords[t].split(' / ')[0]).join('–'))}</span><small lang="en">${escapeHtml(d.trans.split('–').map(t=>transWords[t].split(' / ')[1]).join('–'))}</small></td><td>${riDisplay}</td><td>${sgDisplay}</td><td>${x.optics||'—'}</td><td><button class="small-button detail-action" data-id="${x.n}" aria-expanded="${open}" aria-controls="detail-${x.n}">${open?'收起 / Close':'展开 / Details'}</button></td><td class="match-percent"><span>RI ${matchPercent(nominalIntervals(x,'riIntervals'),ri)}</span><span>SG ${matchPercent(nominalIntervals(x,'sgIntervals'),sg)}</span></td></tr>${detail}`;
+   }).join('')}</tbody>`:`<tbody><tr><td class="empty" colspan="10">没有相符候选 / No matching candidates.</td></tr></tbody>`;
    document.querySelectorAll('.detail-action').forEach(button=>button.addEventListener('click',()=>{const id=Number(button.dataset.id);expandedIds.has(id)?expandedIds.delete(id):expandedIds.add(id);render();}));
    document.querySelectorAll('.candidate-action').forEach(button=>button.addEventListener('click',()=>{const id=Number(button.dataset.id);if(hiddenIds.has(id))hiddenIds.delete(id);else hiddenIds.add(id);render();}));
   }
   function updateSgCalculator(){const air=Number($('airWeight').value.trim().replace(',','.')),water=Number($('waterWeight').value.trim().replace(',','.')),valid=Number.isFinite(air)&&Number.isFinite(water)&&air>water&&water>0,result=valid?air/(air-water):null;$('sgCalcResult').textContent=result==null?'SG —':`SG ${result.toFixed(3)}`;$('useSg').disabled=result==null;$('useSg').dataset.result=result==null?'':result.toFixed(3);}
-  ['q','ri','riTol','sg','sgTol'].forEach(id=>$(id).addEventListener('input',render));['airWeight','waterWeight'].forEach(id=>$(id).addEventListener('input',updateSgCalculator));$('useSg').addEventListener('click',()=>{const result=$('useSg').dataset.result;if(result){$('sg').value=result;render();$('sg').focus();}});$('restoreAll').addEventListener('click',()=>{hiddenIds.clear();render();});document.querySelectorAll('input[name="color"],input[name="optic"],input[name="trans"]').forEach(el=>el.addEventListener('change',render));updateSgCalculator();render();
+  $('sortByMatch').addEventListener('change',render);
+  ['q','ri','riTol','sg','sgTol'].forEach(id=>$(id).addEventListener('input',render));['airWeight','waterWeight'].forEach(id=>$(id).addEventListener('input',updateSgCalculator));$('useSg').addEventListener('click',()=>{const result=$('useSg').dataset.result;if(result){$('sg').value=result;render();$('sg').focus();}});$('restoreAll').addEventListener('click',()=>{hiddenIds.clear();render();});document.querySelectorAll('input[name="color"],input[name="optic"],input[name="trans"],input[name="uv"],input[name="chart"]').forEach(el=>el.addEventListener('change',render));updateSgCalculator();render();
   </script>
 </body></html>
